@@ -4,7 +4,7 @@
 
 :root {
   --black: #242424;
-  --background-main: rgba(255, 255, 255, 0.87);
+  --background-main: #f0f4f9;
 
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
