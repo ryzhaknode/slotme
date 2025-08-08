@@ -26,6 +26,8 @@ export default function AuthForm({ type, title }: Props) {
   });
 
   const onSubmit: SubmitHandler<IAuthFormValues> = (userData) => {
+    console.log(userData);
+
     // const action = type === 'register' ? register(userData) : logIn(userData);
     // dispatch(action)
     //   .unwrap()
