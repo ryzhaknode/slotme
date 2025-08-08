@@ -1,16 +1,16 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { IAuthState } from '../../types/authTypes';
 
-const handlePending = (state) => {
-  state.loading = true;
-  state.authProcess = true;
-};
+// const handlePending = (state: IAuthState) => {
+//   state.loading = true;
+//   state.authProcess = true;
+// };
 
-const handleRejected = (state) => {
-  state.loading = false;
-  state.error = true;
-  state.authProcess = false;
-};
+// const handleRejected = (state: IAuthState) => {
+//   state.loading = false;
+//   state.error = true;
+//   state.authProcess = false;
+// };
 
 const initialState: IAuthState = {
   user: {
@@ -42,9 +42,9 @@ const authSlice = createSlice({
       state.authProcess = false;
     },
   },
-  extraReducers: (builder) => {
-    builder;
-  },
+  // extraReducers: (builder) => {
+  //   builder;
+  // },
 });
 
 export const { setTokens, clearTokens, finishAuthProcess } = authSlice.actions;
