@@ -1,9 +1,10 @@
-import express from 'express';
+import { startServer } from './server.js';
+import prisma from '../prisma/prisma.js';
 
-const app = express();
+const bootstrap = async () => {
+  await prisma.$connect();
 
-const PORT = 3000;
+  startServer();
+};
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+bootstrap();
