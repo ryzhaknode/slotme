@@ -19,3 +19,13 @@ export interface IAuthFormValues {
   email: string;
   password: string;
 }
+
+export interface IAuthResponse {
+  data: IUser;
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface IErrorResponse {
+  message: string;
+}

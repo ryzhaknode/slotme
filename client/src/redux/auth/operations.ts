@@ -2,61 +2,64 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import instance, { clearAuthHeader, setAuthHeader } from '../../utils/axiosInterceptor';
 import { handleError } from '../helpers';
 import { setTokens } from './slice';
-import type { IUser } from '../../types/authTypes';
+import type { IAuthFormValues, IAuthResponse, IErrorResponse } from '../../types/authTypes';
 import type { RootState } from '../store';
 
-interface IRefreshUserResponse {
-  accessToken: string;
-  user: IUser;
-}
+export const register = createAsyncThunk<IAuthResponse, IAuthFormValues, { rejectValue: IErrorResponse }>(
+  'auth/register',
+  async (newUser, thunkAPI) => {
+    try {
+      const response = await instance.post('/user/register', newUser);
+      setAuthHeader(response.data.data.accessToken);
 
-export const register = createAsyncThunk('auth/register', async (newUser, thunkAPI) => {
-  try {
-    const response = await instance.post('/auth/register', newUser);
+      return response.data.data;
+    } catch (error) {
+      const errorMessage = handleError(error);
+      return thunkAPI.rejectWithValue({ message: errorMessage });
+    }
+  },
+);
 
-    setAuthHeader(response.data.data.accessToken);
+export const logIn = createAsyncThunk<IAuthResponse, IAuthFormValues, { rejectValue: IErrorResponse }>(
+  'auth/login',
+  async (userInfo, thunkAPI) => {
+    try {
+      const response = await instance.post('/user/login', userInfo);
+      setAuthHeader(response.data.data.accessToken);
 
-    return response.data.data;
-  } catch (error) {
-    const errorMessage = handleError(error);
-    return thunkAPI.rejectWithValue({ message: errorMessage });
-  }
-});
+      return response.data.data;
+    } catch (error) {
+      const errorMessage = handleError(error);
+      return thunkAPI.rejectWithValue({ message: errorMessage });
+    }
+  },
+);
 
-export const logIn = createAsyncThunk('auth/login', async (userInfo, thunkAPI) => {
-  try {
-    const response = await instance.post('/users/login', userInfo);
-    setAuthHeader(response.data.token);
+export const logOut = createAsyncThunk<void, void, { rejectValue: IErrorResponse }>(
+  'auth/logout',
+  async (_, thunkAPI) => {
+    try {
+      await instance.post('/user/logout');
+      clearAuthHeader();
+    } catch (error) {
+      const errorMessage = handleError(error);
+      return thunkAPI.rejectWithValue({ message: errorMessage });
+    }
+  },
+);
 
-    return response.data;
-  } catch (error) {
-    const errorMessage = handleError(error);
-    return thunkAPI.rejectWithValue({ message: errorMessage });
-  }
-});
-
-export const logOut = createAsyncThunk('auth/logout', async (_, thunkAPI) => {
-  try {
-    await instance.post('/users/logout');
-    clearAuthHeader();
-  } catch (error) {
-    const errorMessage = handleError(error);
-    return thunkAPI.rejectWithValue({ message: errorMessage });
-  }
-});
-
-export const refreshUser = createAsyncThunk<IRefreshUserResponse, void, { state: RootState; rejectValue: string }>(
+export const refreshUser = createAsyncThunk<IAuthResponse, void, { state: RootState; rejectValue: IErrorResponse }>(
   'auth/refresh',
   async (_, thunkAPI) => {
     const reduxState = thunkAPI.getState();
     const savedRefreshToken = reduxState.auth.refreshToken;
 
     if (!savedRefreshToken) {
-      return thunkAPI.rejectWithValue('No refresh token available');
+      return thunkAPI.rejectWithValue({ message: 'No refresh token available' });
     }
 
     try {
-      const response = await instance.post('/auth/refresh', {
+      const response = await instance.post('/user/refresh', {
         refreshToken: savedRefreshToken,
       });
 
@@ -65,15 +68,10 @@ export const refreshUser = createAsyncThunk<IRefreshUserResponse, void, { state:
       thunkAPI.dispatch(setTokens({ accessToken, refreshToken }));
       setAuthHeader(accessToken);
 
-      const userResponse = await instance.get('/auth/user-info');
-
-      return {
-        accessToken, // додаємо до відповіді accessToken який потрібен інтерцептору для повторного виклику запиту що визвав рефреш!
-        user: userResponse.data,
-      };
+      return response.data.data;
     } catch (error) {
       const errorMessage = handleError(error);
-      return thunkAPI.rejectWithValue(errorMessage);
+      return thunkAPI.rejectWithValue({ message: errorMessage });
     }
   },
   {

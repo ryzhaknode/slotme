@@ -1,10 +1,9 @@
+import { useSelector } from 'react-redux';
 import { NavLink, useMatch } from 'react-router-dom';
-// import { useSelector } from 'react-redux';
-// import { selectIsLoggedIn } from '../../redux/auth/selectors';
+import { selectIsLoggedIn } from '../../redux/auth/selectors';
 
 export default function Navigation() {
-  //   const isLoggedIn = useSelector(selectIsLoggedIn);
-  const isLoggedIn = true;
+  const isLoggedIn = useSelector(selectIsLoggedIn);
 
   const matchHome = useMatch({ path: '/', end: true });
   const matchContacts = useMatch('/chat');

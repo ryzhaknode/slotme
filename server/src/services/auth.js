@@ -48,9 +48,17 @@ export const loginUser = async (payload) => {
 
   const newSession = createSession(existingUser.id);
 
-  return await prisma.session.create({
+  const session = await prisma.session.create({
     data: { ...newSession },
   });
+
+  return {
+    user: {
+      name: existingUser.name,
+      email: existingUser.email,
+    },
+    session,
+  };
 };
 
 export const logoutUser = async (accessToken) => {
@@ -71,6 +79,10 @@ export const refreshUsersSession = async ({ refreshToken }) => {
   }
 
   const { id } = parseToken(refreshToken, 'refresh');
+
+  const existingUser = await prisma.user.findUnique({
+    where: { id: id },
+  });
 
   const session = await prisma.session.findUnique({
     where: {
@@ -93,7 +105,15 @@ export const refreshUsersSession = async ({ refreshToken }) => {
 
   await prisma.session.deleteMany({ where: { userId: id, refreshToken } });
 
-  return await prisma.session.create({
+  const newCreatedSession = await prisma.session.create({
     data: { ...newSession },
   });
+
+  return {
+    user: {
+      name: existingUser.name,
+      email: existingUser.email,
+    },
+    newSession: newCreatedSession,
+  };
 };

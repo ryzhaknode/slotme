@@ -1,9 +1,15 @@
-import { lazy, Suspense } from 'react';
+import toast from 'react-hot-toast';
+import { lazy, Suspense, useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
+import { useAppDispatch } from '../../redux/store';
+import { useSelector } from 'react-redux';
+import { selectIsRefreshing } from '../../redux/auth/selectors';
+import { refreshUser } from '../../redux/auth/operations';
 
 import Layout from '../Layout/Layout';
 import RestrictedRoute from '../RestrictedRoute';
 import PrivateRoute from '../PrivateRoute';
+import CustomLoader from '../CustomLoader/CustomLoader';
 
 const HomePage = lazy(() => import('../../pages/HomePage/HomePage'));
 const RegisterPage = lazy(() => import('../../pages/RegisterPage/RegisterPage'));
@@ -11,7 +17,20 @@ const LoginPage = lazy(() => import('../../pages/LoginPage/LoginPage'));
 const ChatPage = lazy(() => import('../../pages/ChatPage/ChatPage'));
 
 export default function App() {
-  return (
+  const dispatch = useAppDispatch();
+  const isRefreshing = useSelector(selectIsRefreshing);
+
+  useEffect(() => {
+    dispatch(refreshUser())
+      .unwrap()
+      .catch((error: { message: string }) => {
+        toast.error(error.message);
+      });
+  }, [dispatch]);
+
+  return isRefreshing ? (
+    <CustomLoader />
+  ) : (
     <Layout>
       <Suspense fallback={null}>
         <Routes>

@@ -1,16 +1,17 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { IAuthState } from '../../types/authTypes';
+import { logIn, logOut, refreshUser, register } from './operations';
 
-// const handlePending = (state: IAuthState) => {
-//   state.loading = true;
-//   state.authProcess = true;
-// };
+const handlePending = (state: IAuthState) => {
+  state.loading = true;
+  state.authProcess = true;
+};
 
-// const handleRejected = (state: IAuthState) => {
-//   state.loading = false;
-//   state.error = true;
-//   state.authProcess = false;
-// };
+const handleRejected = (state: IAuthState) => {
+  state.loading = false;
+  state.error = true;
+  state.authProcess = false;
+};
 
 const initialState: IAuthState = {
   user: {
@@ -42,9 +43,63 @@ const authSlice = createSlice({
       state.authProcess = false;
     },
   },
-  // extraReducers: (builder) => {
-  //   builder;
-  // },
+  extraReducers: (builder) => {
+    builder
+
+      .addCase(register.pending, handlePending)
+      .addCase(register.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        state.user = action.payload.data;
+        state.accessToken = action.payload.accessToken;
+        state.refreshToken = action.payload.refreshToken;
+        state.isLoggedIn = true;
+        state.authProcess = false;
+      })
+      .addCase(register.rejected, handleRejected)
+
+      .addCase(logIn.pending, handlePending)
+      .addCase(logIn.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        state.user = action.payload.data;
+        state.accessToken = action.payload.accessToken;
+        state.refreshToken = action.payload.refreshToken;
+        state.isLoggedIn = true;
+        state.authProcess = false;
+      })
+      .addCase(logIn.rejected, handleRejected)
+
+      .addCase(logOut.pending, handlePending)
+      .addCase(logOut.fulfilled, (state) => {
+        state.loading = false;
+        state.error = null;
+        state.user = {
+          name: null,
+          email: null,
+        };
+        state.accessToken = null;
+        state.refreshToken = null;
+        state.isLoggedIn = false;
+        state.authProcess = false;
+      })
+      .addCase(logOut.rejected, handleRejected)
+
+      .addCase(refreshUser.pending, (state) => {
+        state.isRefreshing = true;
+      })
+      .addCase(refreshUser.fulfilled, (state, action) => {
+        state.user = action.payload.data;
+        state.isLoggedIn = true;
+        state.loading = false;
+        state.isRefreshing = false;
+        state.authProcess = false;
+      })
+      .addCase(refreshUser.rejected, (state) => {
+        state.isRefreshing = false;
+        state.authProcess = false;
+      });
+  },
 });
 
 export const { setTokens, clearTokens, finishAuthProcess } = authSlice.actions;

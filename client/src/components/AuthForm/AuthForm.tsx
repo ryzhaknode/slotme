@@ -1,12 +1,11 @@
-// import toast from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { FormProvider, useForm } from 'react-hook-form';
-import type { SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-// import { useDispatch } from 'react-redux';
-
-// import { logIn, register } from '../../redux/auth/operations';
+import { logIn, register } from '../../redux/auth/operations';
 import { signUpSchema, singInSchema } from '../../utils/validationSchemas';
+import type { SubmitHandler } from 'react-hook-form';
 import type { IAuthFormValues } from '../../types/authTypes';
+import { useAppDispatch } from '../../redux/store';
 
 import InputField from '../InputField/InputField';
 import FormButton from '../FormButton/FormButton';
@@ -17,7 +16,7 @@ type Props = {
 };
 
 export default function AuthForm({ type, title }: Props) {
-  // const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const methods = useForm<IAuthFormValues>({
     resolver: yupResolver(type === 'register' ? signUpSchema : singInSchema),
@@ -26,17 +25,15 @@ export default function AuthForm({ type, title }: Props) {
   });
 
   const onSubmit: SubmitHandler<IAuthFormValues> = (userData) => {
-    console.log(userData);
-
-    // const action = type === 'register' ? register(userData) : logIn(userData);
-    // dispatch(action)
-    //   .unwrap()
-    //   .then(() => {
-    //     methods.reset();
-    //   })
-    //   .catch((error: { message: string }) => {
-    //     toast.error(error.message);
-    //   });
+    const action = type === 'register' ? register(userData) : logIn(userData);
+    dispatch(action)
+      .unwrap()
+      .then(() => {
+        methods.reset();
+      })
+      .catch((error: { message: string }) => {
+        toast.error(error.message);
+      });
   };
 
   return (

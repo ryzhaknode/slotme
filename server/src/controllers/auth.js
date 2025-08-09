@@ -3,7 +3,7 @@ import { loginUser, logoutUser, refreshUsersSession, registerUser } from '../ser
 export const registerUserController = async (req, res) => {
   const user = await registerUser(req.body);
 
-  const session = await loginUser(req.body);
+  const { session } = await loginUser(req.body);
 
   const { name, email } = user;
 
@@ -24,12 +24,20 @@ export const registerUserController = async (req, res) => {
 };
 
 export const loginUserController = async (req, res) => {
-  const session = await loginUser(req.body);
+  const { user, session } = await loginUser(req.body);
+
+  const { name, email } = user;
+
+  const data = {
+    name,
+    email,
+  };
 
   res.status(200).json({
     status: 200,
     message: 'Successfully logged in an user!',
     data: {
+      data,
       accessToken: session.accessToken,
       refreshToken: session.refreshToken,
     },
@@ -47,14 +55,22 @@ export const logoutUserController = async (req, res) => {
 export const refreshSessionController = async (req, res) => {
   const { refreshToken } = req.body;
 
-  const newSession = await refreshUsersSession({
+  const { user, newSession } = await refreshUsersSession({
     refreshToken,
   });
+
+  const { name, email } = user;
+
+  const data = {
+    name,
+    email,
+  };
 
   res.status(200).json({
     status: 200,
     message: 'Successfully refreshed a session!',
     data: {
+      data,
       accessToken: newSession.accessToken,
       refreshToken: newSession.refreshToken,
     },
