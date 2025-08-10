@@ -3,6 +3,8 @@ import { configureStore } from '@reduxjs/toolkit';
 import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
 import { useDispatch, useSelector } from 'react-redux';
 import { authReducer } from './auth/slice';
+import { usersReducer } from './contacts/slice';
+import { chatReducer } from './chat/slice';
 import { setStore } from '../utils/refreshHandler';
 
 import type { PersistConfig } from 'redux-persist';
@@ -20,6 +22,8 @@ const persistedAuthReducer = persistReducer(authPersistConfig, authReducer);
 export const store = configureStore({
   reducer: {
     auth: persistedAuthReducer,
+    contacts: usersReducer,
+    chat: chatReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

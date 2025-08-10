@@ -15,6 +15,7 @@ const handleRejected = (state: IAuthState) => {
 
 const initialState: IAuthState = {
   user: {
+    id: null,
     name: null,
     email: null,
   },
@@ -75,6 +76,7 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = null;
         state.user = {
+          id: null,
           name: null,
           email: null,
         };

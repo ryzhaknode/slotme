@@ -5,9 +5,10 @@ export const registerUserController = async (req, res) => {
 
   const { session } = await loginUser(req.body);
 
-  const { name, email } = user;
+  const { id, name, email } = user;
 
   const data = {
+    id,
     name,
     email,
   };
@@ -26,9 +27,10 @@ export const registerUserController = async (req, res) => {
 export const loginUserController = async (req, res) => {
   const { user, session } = await loginUser(req.body);
 
-  const { name, email } = user;
+  const { id, name, email } = user;
 
   const data = {
+    id,
     name,
     email,
   };
@@ -59,9 +61,10 @@ export const refreshSessionController = async (req, res) => {
     refreshToken,
   });
 
-  const { name, email } = user;
+  const { id, name, email } = user;
 
   const data = {
+    id,
     name,
     email,
   };
