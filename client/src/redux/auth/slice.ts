@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
-import type { IAuthState } from '../../types/authTypes';
 import { logIn, logOut, refreshUser, register } from './operations';
+import { resetAppState } from '../actions/globalActions';
+import type { IAuthState } from '../../types/authTypes';
 
 const handlePending = (state: IAuthState) => {
   state.loading = true;
@@ -100,7 +101,9 @@ const authSlice = createSlice({
       .addCase(refreshUser.rejected, (state) => {
         state.isRefreshing = false;
         state.authProcess = false;
-      });
+      })
+
+      .addCase(resetAppState, () => initialState);
   },
 });
 

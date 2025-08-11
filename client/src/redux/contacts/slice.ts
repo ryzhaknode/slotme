@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { fetchAllUsers } from './operation';
-
+import { resetAppState } from '../actions/globalActions';
 import type { IContactsState } from '../../types/contactsTypes';
 
 const handlePending = (state: IContactsState) => {
@@ -30,7 +30,9 @@ const usersSlice = createSlice({
         state.error = null;
         state.users = action.payload.data;
       })
-      .addCase(fetchAllUsers.rejected, handleRejected);
+      .addCase(fetchAllUsers.rejected, handleRejected)
+
+      .addCase(resetAppState, () => initialState);
   },
 });
 

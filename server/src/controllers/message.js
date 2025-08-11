@@ -1,16 +1,4 @@
-import { deleteMessage, getMessages, sendMessage, updateMessage } from '../services/message.js';
-
-export const getMessagesController = async (req, res) => {
-  const chatId = req.params.chatId;
-
-  const messages = await getMessages(chatId);
-
-  res.status(200).json({
-    status: 200,
-    message: 'Messages fetched successfully!',
-    data: messages,
-  });
-};
+import { deleteMessage, sendMessage, updateMessage } from '../services/message.js';
 
 export const sendMessageController = async (req, res) => {
   const senderId = req.user.id;

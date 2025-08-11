@@ -1,15 +1,24 @@
+import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../../redux/auth/selectors';
 import { logOut } from '../../redux/auth/operations';
 import { useAppDispatch } from '../../redux/store';
 import { MdLogout } from 'react-icons/md';
+import { resetAppState } from '../../redux/actions/globalActions';
 
 export default function UserMenu() {
   const dispatch = useAppDispatch();
   const { name } = useSelector(selectUser);
 
   const handleLogout = () => {
-    dispatch(logOut());
+    dispatch(logOut())
+      .unwrap()
+      .then(() => {
+        dispatch(resetAppState());
+      })
+      .catch((error) => {
+        toast.error(error.message);
+      });
   };
 
   return (

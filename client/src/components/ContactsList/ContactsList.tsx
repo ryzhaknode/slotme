@@ -17,7 +17,7 @@ export default function ContactsList({ contacts, onSelect, selectedUserId }: IPr
             <li
               key={contact.id}
               onClick={() => !isSelected && onSelect(contact)}
-              className={`p-3 rounded-[12px] shadow-sm transition cursor-pointer border border-gray-100
+              className={`p-3 rounded-[12px] shadow-sm transition cursor-pointer border border-gray-200
                 ${
                   isSelected
                     ? 'bg-green-500 text-white shadow-sm'

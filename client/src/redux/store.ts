@@ -2,10 +2,11 @@ import storage from 'redux-persist/lib/storage';
 import { configureStore } from '@reduxjs/toolkit';
 import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
 import { useDispatch, useSelector } from 'react-redux';
+import { setStore } from '../utils/refreshHandler';
 import { authReducer } from './auth/slice';
 import { usersReducer } from './contacts/slice';
 import { chatReducer } from './chat/slice';
-import { setStore } from '../utils/refreshHandler';
+import { messageReducer } from './message/slice';
 
 import type { PersistConfig } from 'redux-persist';
 import type { TypedUseSelectorHook } from 'react-redux';
@@ -24,6 +25,7 @@ export const store = configureStore({
     auth: persistedAuthReducer,
     contacts: usersReducer,
     chat: chatReducer,
+    message: messageReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

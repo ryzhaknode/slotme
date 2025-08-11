@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { createChat } from './operation';
+import { resetAppState } from '../actions/globalActions';
 import type { IChatState } from '../../types/chatTypes';
 
 const handlePending = (state: IChatState) => {
@@ -32,7 +33,9 @@ const chatSlice = createSlice({
         state.error = null;
         state.chat = action.payload.data;
       })
-      .addCase(createChat.rejected, handleRejected);
+      .addCase(createChat.rejected, handleRejected)
+
+      .addCase(resetAppState, () => initialState);
   },
 });
 

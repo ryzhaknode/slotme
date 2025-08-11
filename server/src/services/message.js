@@ -1,14 +1,6 @@
 import createHttpError from 'http-errors';
 import prisma from '../../prisma/prisma.js';
 
-export const getMessages = async (chatId) => {
-  return await prisma.message.findMany({
-    where: { chatId },
-    include: { sender: true, files: true },
-    orderBy: { createdAt: 'asc' },
-  });
-};
-
 export const sendMessage = async (senderId, chatId, { text, files }) => {
   return await prisma.message.create({
     data: {

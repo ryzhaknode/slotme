@@ -54,6 +54,7 @@ export const loginUser = async (payload) => {
 
   return {
     user: {
+      id: existingUser.id,
       name: existingUser.name,
       email: existingUser.email,
     },
@@ -111,6 +112,7 @@ export const refreshUsersSession = async ({ refreshToken }) => {
 
   return {
     user: {
+      id: existingUser.id,
       name: existingUser.name,
       email: existingUser.email,
     },

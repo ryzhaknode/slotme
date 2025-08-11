@@ -1,4 +1,4 @@
-import { createChat, getUserChats } from '../services/chat.js';
+import { createChat, getMessages } from '../services/chat.js';
 
 export const createChatController = async (req, res) => {
   const currentUserId = req.user.id;
@@ -21,14 +21,14 @@ export const createChatController = async (req, res) => {
   });
 };
 
-export const getUserChatsController = async (req, res) => {
-  const currentUserId = req.user.id;
+export const getMessagesController = async (req, res) => {
+  const chatId = req.params.chatId;
 
-  const chats = await getUserChats(currentUserId);
+  const messages = await getMessages(chatId);
 
   res.status(200).json({
     status: 200,
-    message: 'Chats fetched successfully',
-    data: chats,
+    message: 'Messages fetched successfully!',
+    data: messages,
   });
 };

@@ -1,0 +1,30 @@
+export interface IFile {
+  id: string;
+  url: string;
+}
+
+export interface IUserShort {
+  id: string;
+  name: string;
+  email?: string;
+}
+
+export interface IMessage {
+  id: string;
+  text?: string | null;
+  sender: IUserShort;
+  chatId: string;
+  files: IFile[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface IMessagesState {
+  messages: IMessage[] | [];
+  loading: boolean;
+  error: boolean | null;
+}
+
+export interface IMessagesResponse {
+  data: IMessage[] | [];
+}
