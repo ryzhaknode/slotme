@@ -28,3 +28,13 @@ export interface IMessagesState {
 export interface IMessagesResponse {
   data: IMessage[] | [];
 }
+
+export interface ICreateMessagePayload {
+  chatId: string;
+  text: string;
+  files?: File[];
+}
+
+export interface ICreateMessagesResponse {
+  data: IMessage;
+}

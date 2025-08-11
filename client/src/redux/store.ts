@@ -11,6 +11,8 @@ import { messageReducer } from './message/slice';
 import type { PersistConfig } from 'redux-persist';
 import type { TypedUseSelectorHook } from 'react-redux';
 import type { IAuthState } from '../types/authTypes';
+import type { IChatState } from '../types/chatTypes';
+import type { IMessagesState } from '../types/messageTypes';
 
 const authPersistConfig: PersistConfig<IAuthState> = {
   key: 'auth',
@@ -18,14 +20,28 @@ const authPersistConfig: PersistConfig<IAuthState> = {
   whitelist: ['accessToken', 'refreshToken'],
 };
 
+const chatPersistConfig: PersistConfig<IChatState> = {
+  key: 'chat',
+  storage,
+  whitelist: ['chat'],
+};
+
+const messagePersistConfig: PersistConfig<IMessagesState> = {
+  key: 'messages',
+  storage,
+  whitelist: ['messages'],
+};
+
 const persistedAuthReducer = persistReducer(authPersistConfig, authReducer);
+const persistedChatReducer = persistReducer(chatPersistConfig, chatReducer);
+const persistedMessageReducer = persistReducer(messagePersistConfig, messageReducer);
 
 export const store = configureStore({
   reducer: {
     auth: persistedAuthReducer,
     contacts: usersReducer,
-    chat: chatReducer,
-    message: messageReducer,
+    chat: persistedChatReducer,
+    message: persistedMessageReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

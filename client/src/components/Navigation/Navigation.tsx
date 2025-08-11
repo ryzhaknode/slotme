@@ -11,7 +11,7 @@ export default function Navigation() {
   const currentTab: '/' | '/chat' | null = matchHome ? '/' : matchContacts ? '/chat' : null;
 
   const getLinkClass = (path: '/' | '/chat') =>
-    `uppercase text-sm ${currentTab === path ? 'text-blue-600 font-semibold' : 'text-gray-700'}`;
+    `uppercase text-sm ${currentTab === path ? 'text-green-500 font-semibold' : 'text-gray-700'}`;
 
   return (
     <nav className="flex gap-6 p-4">

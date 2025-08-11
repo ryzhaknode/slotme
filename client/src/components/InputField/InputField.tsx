@@ -32,7 +32,7 @@ export default function InputField({ name, type = 'text', placeholder }: Props) 
         type={inputType}
         placeholder={placeholder}
         {...register(name)}
-        className={`w-full h-14 px-4 py-2 rounded-md border border-gray-300 focus:outline-none text-sl`}
+        className="w-full h-14 px-4 py-2 rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-green-400"
       />
 
       {error && <p className="flex items-center gap-1 text-red-500 text-sm absolute right-0 top-[55px]">{error}</p>}
