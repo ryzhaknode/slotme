@@ -25,7 +25,13 @@ export const updateMessageController = async (req, res) => {
   const userId = req.user.id;
   const messageId = req.params.id;
 
-  const message = await updateMessage(userId, messageId, req.body.text);
+  const { text } = req.body;
+
+  const files = (req.files || []).map((file) => ({
+    url: `${BASE_URL}/uploads/${file.filename}`,
+  }));
+
+  const message = await updateMessage(userId, messageId, { text, files });
 
   res.status(200).json({
     status: 200,

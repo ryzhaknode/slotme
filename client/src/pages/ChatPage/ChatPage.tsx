@@ -6,10 +6,11 @@ import { useSelector } from 'react-redux';
 import { selectUsers } from '../../redux/contacts/selectors';
 import { createChat } from '../../redux/chat/operation';
 import { selectChat } from '../../redux/chat/selectors';
-import { createMessage, fetchMessagesByChatId } from '../../redux/message/operation';
+import { createMessage, deleteMessage, editeMessage, fetchMessagesByChatId } from '../../redux/message/operation';
 import { selectMessages } from '../../redux/message/selectors';
 import { selectUser } from '../../redux/auth/selectors';
 import type { IUser } from '../../types/authTypes';
+import type { IMessage } from '../../types/messageTypes';
 
 import ContactsSidebar from '../../components/ContactsSidebar/ContactsSidebar';
 import MessagesContainer from '../../components/MessagesContainer/MessagesContainer';
@@ -26,7 +27,9 @@ export default function ChatPage() {
 
   const [messageText, setMessageText] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [editingMessage, setEditingMessage] = useState<{ id: string; text: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const textInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     dispatch(fetchAllUsers())
@@ -36,10 +39,36 @@ export default function ChatPage() {
       });
   }, [dispatch]);
 
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      const target = event.target as HTMLElement;
+
+      if (target.closest('[data-send-btn="true"]')) return;
+
+      if (textInputRef.current?.contains(target)) return;
+
+      let el: HTMLElement | null = target;
+      while (el) {
+        if (el.dataset.editing === 'true') return;
+        el = el.parentElement;
+      }
+
+      setMessageText('');
+      setSelectedFiles([]);
+      setEditingMessage(null);
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [textInputRef]);
+
   const handleSelectContact = (contact: IUser) => {
     const data = {
       otherUserId: contact.id,
     };
+
     dispatch(createChat(data))
       .unwrap()
       .then((res) => {
@@ -56,7 +85,7 @@ export default function ChatPage() {
   };
 
   const handleSendMessage = () => {
-    if (!messageText.trim()) {
+    if (!messageText.trim() && selectedFiles.length === 0 && !editingMessage) {
       toast.error('Cannot send empty message');
       return;
     }
@@ -70,21 +99,37 @@ export default function ChatPage() {
     formData.append('text', messageText);
     selectedFiles.forEach((file) => formData.append('files', file));
 
-    dispatch(createMessage({ chatId, formData }))
-      .unwrap()
-      .then(() => {
-        dispatch(fetchMessagesByChatId(chatId))
-          .unwrap()
-          .catch((error: { message: string }) => {
-            toast.error(error.message);
-          });
-      })
-      .catch((error: { message: string }) => {
-        toast.error(error.message);
-      });
-
+    if (editingMessage) {
+      const messageId = editingMessage.id;
+      dispatch(editeMessage({ messageId, formData }))
+        .unwrap()
+        .then(() => {
+          dispatch(fetchMessagesByChatId(chatId))
+            .unwrap()
+            .catch((error: { message: string }) => {
+              toast.error(error.message);
+            });
+        })
+        .catch((error: { message: string }) => {
+          toast.error(error.message);
+        });
+    } else {
+      dispatch(createMessage({ chatId, formData }))
+        .unwrap()
+        .then(() => {
+          dispatch(fetchMessagesByChatId(chatId))
+            .unwrap()
+            .catch((error: { message: string }) => {
+              toast.error(error.message);
+            });
+        })
+        .catch((error: { message: string }) => {
+          toast.error(error.message);
+        });
+    }
     setMessageText('');
     setSelectedFiles([]);
+    setEditingMessage(null);
   };
 
   const handleFileButtonClick = () => {
@@ -102,13 +147,44 @@ export default function ChatPage() {
     setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const handleEditMessage = (message: IMessage) => {
+    setEditingMessage({ id: message.id, text: message.text || '' });
+    setMessageText(message.text || '');
+    textInputRef.current?.focus?.();
+  };
+
+  const handleDeleteMessage = (messageId: string) => {
+    dispatch(deleteMessage(messageId))
+      .unwrap()
+      .then(() => {
+        dispatch(fetchMessagesByChatId(chatId))
+          .unwrap()
+          .catch((error: { message: string }) => {
+            toast.error(error.message);
+          });
+      })
+      .catch((error: { message: string }) => {
+        toast.error(error.message);
+      });
+
+    setMessageText('');
+    setSelectedFiles([]);
+    setEditingMessage(null);
+  };
+
   return (
     <div className="min-w-[360px] max-w-[1046px] mx-auto px-[15px]">
       <div className="bg-white p-[36px] rounded-[28px] flex gap-6">
         <ContactsSidebar contacts={contacts} onSelectContact={handleSelectContact} selectedUserId={otherUserId} />
         <div className="flex-1 flex flex-col">
           <h2 className="text-3xl text-[40px] mb-[12px]">Real Time Chat</h2>
-          <MessagesContainer messages={messages} currentUserId={currentUserId} />
+          <MessagesContainer
+            messages={messages}
+            currentUserId={currentUserId}
+            handleEditMessage={handleEditMessage}
+            handleDeleteMessage={handleDeleteMessage}
+            editingMessage={editingMessage}
+          />
           {chatId && (
             <MessageInputBox
               messageText={messageText}
@@ -116,6 +192,7 @@ export default function ChatPage() {
               onSend={handleSendMessage}
               onFileButtonClick={handleFileButtonClick}
               fileInputRef={fileInputRef}
+              textInputRef={textInputRef}
               onFileChange={handleFileChange}
               selectedFiles={selectedFiles}
               onRemoveFile={handleRemoveFile}

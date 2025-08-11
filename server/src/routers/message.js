@@ -3,7 +3,7 @@ import { authenticate } from '../middlewares/authenticate.js';
 import { deleteMessageController, sendMessageController, updateMessageController } from '../controllers/message.js';
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 import { validateParams } from '../middlewares/validateParams.js';
-import { fetchMessagesSchema } from '../validation/message.js';
+import { fetchMessagesSchema, updateMessageSchema } from '../validation/message.js';
 import { upload } from '../middlewares/multer.js';
 
 const router = Router();
@@ -16,7 +16,14 @@ router.post(
   ctrlWrapper(sendMessageController),
 );
 
-router.put('/:id', authenticate, ctrlWrapper(updateMessageController)); // Треба додати validateBody(updateMessageSchema) попередньо створивши відповідну схему
-router.delete('/:id', authenticate, ctrlWrapper(deleteMessageController));
+router.put(
+  '/update/:id',
+  authenticate,
+  validateParams(updateMessageSchema),
+  upload.array('files'),
+  ctrlWrapper(updateMessageController),
+);
+
+router.delete('/delete/:id', authenticate, ctrlWrapper(deleteMessageController));
 
 export default router;

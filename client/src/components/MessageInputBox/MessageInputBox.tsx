@@ -6,6 +6,7 @@ interface IProps {
   onSend: () => void;
   onFileButtonClick: () => void;
   fileInputRef: React.RefObject<HTMLInputElement | null>;
+  textInputRef: React.RefObject<HTMLInputElement | null>;
   onFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   selectedFiles?: File[];
   onRemoveFile?: (index: number) => void;
@@ -17,6 +18,7 @@ export default function MessageInputBox({
   onSend,
   onFileButtonClick,
   fileInputRef,
+  textInputRef,
   onFileChange,
   selectedFiles = [],
   onRemoveFile,
@@ -60,6 +62,7 @@ export default function MessageInputBox({
       <div className="flex items-center gap-3">
         <button
           type="button"
+          data-send-btn="true"
           onClick={onFileButtonClick}
           aria-label="Add file"
           className="w-10 h-10 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-200 transition flex-shrink-0"
@@ -71,7 +74,8 @@ export default function MessageInputBox({
 
         <input
           type="text"
-          className="flex-grow rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-green-400"
+          ref={textInputRef}
+          className="flex-grow rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-none"
           placeholder="Type your message..."
           value={messageText}
           onChange={(e) => onMessageChange(e.target.value)}
@@ -86,6 +90,7 @@ export default function MessageInputBox({
         <button
           type="button"
           onClick={onSend}
+          data-send-btn="true"
           className="bg-green-500 hover:bg-green-600 text-sm text-white font-semibold rounded-lg px-5 py-3 transition flex-shrink-0"
         >
           SEND

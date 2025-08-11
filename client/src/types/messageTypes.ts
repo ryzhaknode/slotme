@@ -37,3 +37,8 @@ export interface ICreateMessagePayload {
 export interface ICreateMessagesResponse {
   data: IMessage;
 }
+
+export interface IEditeMessagePayload {
+  messageId: string;
+  formData: FormData;
+}

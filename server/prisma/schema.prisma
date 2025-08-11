@@ -61,5 +61,5 @@ model File {
   id                      String        @id @default(uuid())
   url                     String
   messageId               String
-  message                 Message       @relation(fields: [messageId], references: [id])
+  message                 Message       @relation(fields: [messageId], references: [id], onDelete: Cascade)
 }

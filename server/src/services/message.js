@@ -8,25 +8,44 @@ export const sendMessage = async (senderId, chatId, { text, files }) => {
       chatId,
       senderId,
       files: {
-        create: files?.map((f) => ({
-          url: f.url,
-        })),
+        create: files?.map((f) => ({ url: f.url })),
       },
     },
     include: { files: true },
   });
 };
 
-export const updateMessage = async (userId, messageId, text) => {
-  const message = await prisma.message.findUnique({ where: { id: messageId } });
+export const updateMessage = async (userId, messageId, { text, files }) => {
+  const message = await prisma.message.findUnique({
+    where: { id: messageId },
+    include: { files: true },
+  });
 
   if (!message || message.senderId !== userId) {
     throw createHttpError(403, 'Forbidden');
   }
 
+  if (!Array.isArray(files) || files.length === 0) {
+    return await prisma.message.update({
+      where: { id: messageId },
+      data: { text: text || null },
+      include: { files: true },
+    });
+  }
+
+  await prisma.file.deleteMany({
+    where: { messageId },
+  });
+
   return await prisma.message.update({
     where: { id: messageId },
-    data: { text },
+    data: {
+      text: text || null,
+      files: {
+        create: files.map((f) => ({ url: f.url })),
+      },
+    },
+    include: { files: true },
   });
 };
 

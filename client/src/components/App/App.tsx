@@ -1,4 +1,4 @@
-import toast from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 import { lazy, Suspense, useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { useAppDispatch } from '../../redux/store';
@@ -40,6 +40,7 @@ export default function App() {
           <Route path="/chat" element={<PrivateRoute component={<ChatPage />} redirectTo="/login" />} />
         </Routes>
       </Suspense>
+      <Toaster position="top-right" />
     </Layout>
   );
 }
