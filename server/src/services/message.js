@@ -4,13 +4,12 @@ import prisma from '../../prisma/prisma.js';
 export const sendMessage = async (senderId, chatId, { text, files }) => {
   return await prisma.message.create({
     data: {
-      text,
+      text: text || null,
       chatId,
       senderId,
       files: {
         create: files?.map((f) => ({
           url: f.url,
-          fileType: f.fileType,
         })),
       },
     },

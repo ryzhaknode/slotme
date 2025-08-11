@@ -31,8 +31,7 @@ export interface IMessagesResponse {
 
 export interface ICreateMessagePayload {
   chatId: string;
-  text: string;
-  files?: File[];
+  formData: FormData;
 }
 
 export interface ICreateMessagesResponse {

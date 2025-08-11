@@ -1,10 +1,18 @@
 import { deleteMessage, sendMessage, updateMessage } from '../services/message.js';
 
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
+
 export const sendMessageController = async (req, res) => {
   const senderId = req.user.id;
   const chatId = req.params.chatId;
 
-  const message = await sendMessage(senderId, chatId, req.body);
+  const { text } = req.body;
+
+  const files = (req.files || []).map((file) => ({
+    url: `${BASE_URL}/uploads/${file.filename}`,
+  }));
+
+  const message = await sendMessage(senderId, chatId, { text, files });
 
   res.status(201).json({
     status: 201,

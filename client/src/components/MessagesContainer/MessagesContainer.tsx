@@ -1,3 +1,4 @@
+import { MdOutlineSimCardDownload } from 'react-icons/md';
 import type { IMessage } from '../../types/messageTypes';
 
 interface IProps {
@@ -28,18 +29,38 @@ export default function MessagesContainer({ messages, currentUserId }: IProps) {
             }`}
           >
             {message.files && message.files.length > 0 && (
-              <div className="mb-1">
-                {message.files.map((file) => (
-                  <a
-                    key={file.id}
-                    href={file.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 underline block"
-                  >
-                    File
-                  </a>
-                ))}
+              <div
+                className={`${
+                  isCurrentUser ? 'mb-1 flex flex-wrap gap-2 justify-end' : 'mb-1 flex flex-wrap gap-2 justify-start'
+                }`}
+              >
+                {message.files.map((file) => {
+                  const isImage = file.url.match(/\.(jpeg|jpg|png|gif|webp)$/i);
+
+                  if (isImage) {
+                    return (
+                      <img
+                        key={file.id}
+                        src={file.url}
+                        alt="attached file"
+                        className="max-w-[240px] max-h-[240px] rounded-md object-cover cursor-pointer"
+                        onClick={() => window.open(file.url, '_blank')}
+                      />
+                    );
+                  }
+
+                  return (
+                    <a
+                      key={file.id}
+                      href={file.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gray-500"
+                    >
+                      <MdOutlineSimCardDownload size={44} />
+                    </a>
+                  );
+                })}
               </div>
             )}
 

@@ -24,12 +24,13 @@ export const createMessage = createAsyncThunk<
   ICreateMessagesResponse,
   ICreateMessagePayload,
   { rejectValue: IErrorResponse }
->('message/fetchMessagesByChatId', async ({ chatId, ...newMessage }, thunkAPI) => {
+>('message/fetchMessagesByChatId', async ({ chatId, formData }, thunkAPI) => {
   try {
-    const response = await instance.post(`/message/create/${chatId}`, {
-      ...newMessage,
+    const response = await instance.post(`/message/create/${chatId}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
     });
-
     return response.data;
   } catch (error) {
     const errorMessage = handleError(error);

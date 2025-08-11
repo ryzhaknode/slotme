@@ -1,3 +1,4 @@
+import path from 'path';
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -14,6 +15,12 @@ const PORT = Number(env('PORT', '3000'));
 
 export const startServer = () => {
   const app = express();
+
+  // Абсолютний шлях до директорії server/uploads
+  const uploadsPath = path.join(process.cwd(), 'uploads');
+
+  // Раздаємо статику
+  app.use('/uploads', express.static(uploadsPath));
 
   app.use(
     express.json({

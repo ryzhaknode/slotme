@@ -1,5 +1,4 @@
 import toast from 'react-hot-toast';
-// import { MdAdd } from 'react-icons/md';
 import { useEffect, useRef, useState } from 'react';
 import { useAppDispatch } from '../../redux/store';
 import { fetchAllUsers } from '../../redux/contacts/operation';
@@ -26,6 +25,7 @@ export default function ChatPage() {
   const currentUserId = user.id;
 
   const [messageText, setMessageText] = useState('');
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -66,13 +66,11 @@ export default function ChatPage() {
       return;
     }
 
-    const newMessage = {
-      chatId,
-      text: messageText,
-      files: [],
-    };
+    const formData = new FormData();
+    formData.append('text', messageText);
+    selectedFiles.forEach((file) => formData.append('files', file));
 
-    dispatch(createMessage(newMessage))
+    dispatch(createMessage({ chatId, formData }))
       .unwrap()
       .then(() => {
         dispatch(fetchMessagesByChatId(chatId))
@@ -86,6 +84,7 @@ export default function ChatPage() {
       });
 
     setMessageText('');
+    setSelectedFiles([]);
   };
 
   const handleFileButtonClick = () => {
@@ -95,9 +94,12 @@ export default function ChatPage() {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && files.length > 0) {
-      // TODO: handle file upload
-      console.log('Selected files:', files);
+      setSelectedFiles((prev) => [...prev, ...Array.from(files)]);
     }
+  };
+
+  const handleRemoveFile = (index: number) => {
+    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -115,6 +117,8 @@ export default function ChatPage() {
               onFileButtonClick={handleFileButtonClick}
               fileInputRef={fileInputRef}
               onFileChange={handleFileChange}
+              selectedFiles={selectedFiles}
+              onRemoveFile={handleRemoveFile}
             />
           )}
         </div>
