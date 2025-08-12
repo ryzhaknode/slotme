@@ -1,4 +1,5 @@
 import toast from 'react-hot-toast';
+import { MdWhatsapp } from 'react-icons/md';
 import { useEffect, useRef, useState } from 'react';
 import { useAppDispatch } from '../../redux/store';
 import { fetchAllUsers } from '../../redux/contacts/operation';
@@ -177,7 +178,10 @@ export default function ChatPage() {
       <div className="bg-white p-[36px] rounded-[28px] flex gap-6">
         <ContactsSidebar contacts={contacts} onSelectContact={handleSelectContact} selectedUserId={otherUserId} />
         <div className="flex-1 flex flex-col">
-          <h2 className="text-3xl text-[40px] mb-[12px]">Real Time Chat</h2>
+          <div className="flex items-center gap-2 mb-[12px]">
+            <MdWhatsapp size={36} className="text-green-500" />
+            <h2 className="text-3xl text-[40px]">Real Time Chat</h2>
+          </div>
           <MessagesContainer
             messages={messages}
             currentUserId={currentUserId}
