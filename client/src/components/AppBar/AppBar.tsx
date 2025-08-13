@@ -9,7 +9,7 @@ export default function AppBar() {
   const isLoggedIn = useSelector(selectIsLoggedIn);
 
   return (
-    <header className=" bg-white max-w-full">
+    <header className="fixed top-0 left-0 w-full bg-white z-50">
       <div className="max-w-[1046px] mx-auto flex justify-between items-center px-[15px]">
         <Navigation />
         {isLoggedIn ? <UserMenu /> : <AuthNav />}

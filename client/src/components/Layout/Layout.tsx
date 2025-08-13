@@ -8,7 +8,7 @@ export default function Layout({ children }: Props) {
   return (
     <div className="min-w-[360px] w-full mx-auto">
       <AppBar />
-      <main className="pt-[120px] pb-[120px]">{children}</main>
+      <main className="pt-[100px] pb-[60px]">{children}</main>
     </div>
   );
 }

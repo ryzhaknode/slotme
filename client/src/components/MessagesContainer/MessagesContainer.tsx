@@ -59,7 +59,6 @@ export default function MessagesContainer({
                 >
                   <MdMoreHoriz size={20} />
                 </button>
-
                 {isDropdownOpen && (
                   <MessageDropdown
                     onEdit={() => handleEditMessage(message)}
@@ -78,20 +77,15 @@ export default function MessagesContainer({
               >
                 {message.files.map((file) => {
                   const isImage = file.url.match(/\.(jpeg|jpg|png|gif|webp)$/i);
-
-                  if (isImage) {
-                    return (
-                      <img
-                        key={file.id}
-                        src={file.url}
-                        alt="attached file"
-                        className="w-[260px] h-auto rounded-md object-cover cursor-pointer"
-                        onClick={() => window.open(file.url, '_blank')}
-                      />
-                    );
-                  }
-
-                  return (
+                  return isImage ? (
+                    <img
+                      key={file.id}
+                      src={file.url}
+                      alt="attached file"
+                      className="w-[260px] h-auto rounded-md object-cover cursor-pointer"
+                      onClick={() => window.open(file.url, '_blank')}
+                    />
+                  ) : (
                     <a
                       key={file.id}
                       href={file.url}
