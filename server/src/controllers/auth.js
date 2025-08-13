@@ -1,3 +1,4 @@
+import { getIo } from '../../socket/index.js';
 import { loginUser, logoutUser, refreshUsersSession, registerUser } from '../services/auth.js';
 
 export const registerUserController = async (req, res) => {
@@ -12,6 +13,9 @@ export const registerUserController = async (req, res) => {
     name,
     email,
   };
+
+  const io = getIo();
+  io.emit('newUser', { message: 'A new user has registered!', data });
 
   res.status(201).json({
     status: 201,

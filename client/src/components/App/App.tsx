@@ -24,9 +24,6 @@ export default function App() {
   useEffect(() => {
     dispatch(refreshUser())
       .unwrap()
-      .catch((error: { message: string }) => {
-        toast.error(error.message);
-      })
       .finally(() => {
         dispatch(finishAuthProcess());
       });

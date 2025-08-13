@@ -18,6 +18,7 @@ import type { IMessage } from '../../types/messageTypes';
 import ContactsSidebar from '../../components/ContactsSidebar/ContactsSidebar';
 import MessagesContainer from '../../components/MessagesContainer/MessagesContainer';
 import MessageInputBox from '../../components/MessageInputBox/MessageInputBox';
+import { addNewUser } from '../../redux/contacts/slice';
 
 export default function ChatPage() {
   const dispatch = useAppDispatch();
@@ -97,6 +98,19 @@ export default function ChatPage() {
       socket.off('deleteMessage', handleDeleteMessage);
     };
   }, [chatId, dispatch]);
+
+  useEffect(() => {
+    const handleNewUser = (newUserData: { message: string; user: IUser }) => {
+      toast.success(newUserData.message);
+      dispatch(addNewUser(newUserData));
+    };
+
+    socket.on('newUser', handleNewUser);
+
+    return () => {
+      socket.off('newUser', handleNewUser);
+    };
+  }, [dispatch]);
 
   const handleSelectContact = (contact: IUser) => {
     const data = {

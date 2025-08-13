@@ -5,7 +5,7 @@ export interface IContacts {
 }
 
 export interface IContactsState {
-  users: IUser[] | [];
+  users: IUser[];
   loading: boolean;
   error: boolean | null;
 }

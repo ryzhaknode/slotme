@@ -21,7 +21,14 @@ const initialState: IContactsState = {
 const usersSlice = createSlice({
   name: 'contacts',
   initialState,
-  reducers: {},
+  reducers: {
+    addNewUser: (state, action) => {
+      const newUser = action.payload.data;
+      if (!state.users.find((user) => user.id === newUser.id)) {
+        state.users.push(newUser);
+      }
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchAllUsers.pending, handlePending)
@@ -36,4 +43,5 @@ const usersSlice = createSlice({
   },
 });
 
+export const { addNewUser } = usersSlice.actions;
 export const usersReducer = usersSlice.reducer;
