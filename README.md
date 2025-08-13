@@ -71,7 +71,7 @@ This will start three services:
 #### Stop containers
 
 ```bash
-docker-compose down
+docker-compose --env-file ./server/.env down
 ```
 
 ## Prisma
