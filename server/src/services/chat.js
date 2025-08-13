@@ -1,5 +1,6 @@
 import createHttpError from 'http-errors';
 import prisma from '../../prisma/prisma.js';
+import { messageInclude } from '../../prisma/includes/messageInclude.js';
 
 export const createChat = async (currentUserId, otherUserId) => {
   if (otherUserId === currentUserId) {
@@ -29,21 +30,7 @@ export const createChat = async (currentUserId, otherUserId) => {
 export const getMessages = async (chatId) => {
   return await prisma.message.findMany({
     where: { chatId },
-    select: {
-      id: true,
-      text: true,
-      chatId: true,
-      createdAt: true,
-      updatedAt: true,
-      files: true,
-      sender: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-        },
-      },
-    },
+    include: messageInclude,
     orderBy: { createdAt: 'asc' },
   });
 };

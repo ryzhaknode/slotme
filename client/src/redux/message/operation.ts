@@ -6,6 +6,7 @@ import type { IErrorResponse } from '../../types/authTypes.js';
 import type {
   ICreateMessagePayload,
   ICreateMessagesResponse,
+  IDeleteMessagePayload,
   IEditeMessagePayload,
   IMessagesResponse,
 } from '../../types/messageTypes.js';
@@ -43,11 +44,12 @@ export const createMessage = createAsyncThunk<
   }
 });
 
-export const deleteMessage = createAsyncThunk<void, string, { rejectValue: IErrorResponse }>(
+export const deleteMessage = createAsyncThunk<void, IDeleteMessagePayload, { rejectValue: IErrorResponse }>(
   'message/deleteMessage',
-  async (messageId, thunkAPI) => {
+  async (messageData, thunkAPI) => {
+    const { messageId, chatId } = messageData;
     try {
-      await instance.delete(`/message/delete/${messageId}`);
+      await instance.delete(`/message/delete/${messageId}/chat/${chatId}`);
     } catch (error) {
       const errorMessage = handleError(error);
       return thunkAPI.rejectWithValue({ message: errorMessage });

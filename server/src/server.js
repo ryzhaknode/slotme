@@ -5,13 +5,10 @@ import dotenv from 'dotenv';
 
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { errorHandler } from './middlewares/errorHandler.js';
-import { env } from './utils/env.js';
 
 import router from './routers/index.js';
 
 dotenv.config({ quiet: true });
-
-const PORT = Number(env('PORT', '3000'));
 
 export const startServer = () => {
   const app = express();
@@ -30,7 +27,7 @@ export const startServer = () => {
   );
 
   const corsOptions = {
-    origin: ['http://localhost:5173'],
+    origin: 'http://localhost:5173',
     credentials: true,
   };
 
@@ -42,7 +39,5 @@ export const startServer = () => {
 
   app.use(errorHandler);
 
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-  });
+  return app;
 };

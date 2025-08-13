@@ -24,6 +24,6 @@ router.put(
   ctrlWrapper(updateMessageController),
 );
 
-router.delete('/delete/:id', authenticate, ctrlWrapper(deleteMessageController));
+router.delete('/delete/:messageId/chat/:chatId', authenticate, ctrlWrapper(deleteMessageController));
 
 export default router;

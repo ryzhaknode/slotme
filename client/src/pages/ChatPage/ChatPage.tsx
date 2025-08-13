@@ -1,4 +1,5 @@
 import toast from 'react-hot-toast';
+import socket from '../../socket/socket';
 import { MdWhatsapp } from 'react-icons/md';
 import { useEffect, useRef, useState } from 'react';
 import { useAppDispatch } from '../../redux/store';
@@ -10,6 +11,7 @@ import { selectChat } from '../../redux/chat/selectors';
 import { createMessage, deleteMessage, editeMessage, fetchMessagesByChatId } from '../../redux/message/operation';
 import { selectMessages } from '../../redux/message/selectors';
 import { selectUser } from '../../redux/auth/selectors';
+import { addMessage, removeMessage, updateMessage } from '../../redux/message/slice';
 import type { IUser } from '../../types/authTypes';
 import type { IMessage } from '../../types/messageTypes';
 
@@ -65,6 +67,37 @@ export default function ChatPage() {
     };
   }, [textInputRef]);
 
+  useEffect(() => {
+    if (!chatId) return;
+
+    // Входимо в чат з chatId
+    socket.emit('joinChat', chatId);
+
+    // Обробники повідомлень
+    const handleReceiveMessage = (newMessage: IMessage) => {
+      dispatch(addMessage(newMessage));
+    };
+
+    const handleUpdateMessage = (updatedMessage: IMessage) => {
+      dispatch(updateMessage(updatedMessage));
+    };
+
+    const handleDeleteMessage = ({ id }: { id: string }) => {
+      dispatch(removeMessage(id));
+    };
+
+    socket.on('receiveMessage', handleReceiveMessage);
+    socket.on('updateMessage', handleUpdateMessage);
+    socket.on('deleteMessage', handleDeleteMessage);
+
+    // Очіщуємо підписки при розмонтуванні чи зміні чату
+    return () => {
+      socket.off('receiveMessage', handleReceiveMessage);
+      socket.off('updateMessage', handleUpdateMessage);
+      socket.off('deleteMessage', handleDeleteMessage);
+    };
+  }, [chatId, dispatch]);
+
   const handleSelectContact = (contact: IUser) => {
     const data = {
       otherUserId: contact.id,
@@ -104,26 +137,12 @@ export default function ChatPage() {
       const messageId = editingMessage.id;
       dispatch(editeMessage({ messageId, formData }))
         .unwrap()
-        .then(() => {
-          dispatch(fetchMessagesByChatId(chatId))
-            .unwrap()
-            .catch((error: { message: string }) => {
-              toast.error(error.message);
-            });
-        })
         .catch((error: { message: string }) => {
           toast.error(error.message);
         });
     } else {
       dispatch(createMessage({ chatId, formData }))
         .unwrap()
-        .then(() => {
-          dispatch(fetchMessagesByChatId(chatId))
-            .unwrap()
-            .catch((error: { message: string }) => {
-              toast.error(error.message);
-            });
-        })
         .catch((error: { message: string }) => {
           toast.error(error.message);
         });
@@ -155,15 +174,9 @@ export default function ChatPage() {
   };
 
   const handleDeleteMessage = (messageId: string) => {
-    dispatch(deleteMessage(messageId))
+    const messageData = { messageId, chatId };
+    dispatch(deleteMessage(messageData))
       .unwrap()
-      .then(() => {
-        dispatch(fetchMessagesByChatId(chatId))
-          .unwrap()
-          .catch((error: { message: string }) => {
-            toast.error(error.message);
-          });
-      })
       .catch((error: { message: string }) => {
         toast.error(error.message);
       });
@@ -180,7 +193,7 @@ export default function ChatPage() {
         <div className="flex-1 flex flex-col">
           <div className="flex items-center gap-2 mb-[12px]">
             <MdWhatsapp size={36} className="text-green-500" />
-            <h2 className="text-3xl text-[40px]">Real Time Chat</h2>
+            <h2 className="text-3xl text-[32px]">Real Time Chat</h2>
           </div>
           <MessagesContainer
             messages={messages}

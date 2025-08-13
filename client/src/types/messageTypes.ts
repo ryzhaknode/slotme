@@ -3,16 +3,10 @@ export interface IFile {
   url: string;
 }
 
-export interface IUserShort {
-  id: string;
-  name: string;
-  email?: string;
-}
-
 export interface IMessage {
   id: string;
   text?: string | null;
-  sender: IUserShort;
+  senderId: string;
   chatId: string;
   files: IFile[];
   createdAt: string;
@@ -20,7 +14,7 @@ export interface IMessage {
 }
 
 export interface IMessagesState {
-  messages: IMessage[] | [];
+  messages: IMessage[];
   loading: boolean;
   error: boolean | null;
 }
@@ -41,4 +35,9 @@ export interface ICreateMessagesResponse {
 export interface IEditeMessagePayload {
   messageId: string;
   formData: FormData;
+}
+
+export interface IDeleteMessagePayload {
+  messageId: string;
+  chatId: string | null;
 }

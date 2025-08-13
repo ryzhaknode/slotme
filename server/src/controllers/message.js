@@ -1,6 +1,8 @@
+import { getIo } from '../../socket/index.js';
 import { deleteMessage, sendMessage, updateMessage } from '../services/message.js';
+import { env } from '../utils/env.js';
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
+const BASE_URL = env('BASE_URL', 'http://localhost:3000');
 
 export const sendMessageController = async (req, res) => {
   const senderId = req.user.id;
@@ -13,6 +15,10 @@ export const sendMessageController = async (req, res) => {
   }));
 
   const message = await sendMessage(senderId, chatId, { text, files });
+
+  // Надсилаємо повідомлення всім учасникам чату
+  const io = getIo();
+  io.to(chatId).emit('receiveMessage', message);
 
   res.status(201).json({
     status: 201,
@@ -33,6 +39,9 @@ export const updateMessageController = async (req, res) => {
 
   const message = await updateMessage(userId, messageId, { text, files });
 
+  const io = getIo();
+  io.to(message.chatId).emit('updateMessage', message);
+
   res.status(200).json({
     status: 200,
     message: 'Message updated successfully!',
@@ -42,12 +51,17 @@ export const updateMessageController = async (req, res) => {
 
 export const deleteMessageController = async (req, res) => {
   const userId = req.user.id;
-  const messageId = req.params.id;
+  const chatId = req.params.chatId;
+  const messageId = req.params.messageId;
 
   await deleteMessage(userId, messageId);
+
+  const io = getIo();
+  io.to(chatId).emit('deleteMessage', { id: messageId });
 
   res.status(200).json({
     status: 200,
     message: 'Message deleted successfully!',
+    data: { id: messageId },
   });
 };

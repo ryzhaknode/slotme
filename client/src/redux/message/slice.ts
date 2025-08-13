@@ -21,7 +21,21 @@ const initialState: IMessagesState = {
 const messageSlice = createSlice({
   name: 'message',
   initialState,
-  reducers: {},
+  reducers: {
+    addMessage(state, action) {
+      state.messages.push(action.payload);
+    },
+    updateMessage: (state, action) => {
+      const updatedMessage = action.payload;
+      const index = state.messages.findIndex((message) => message.id === updatedMessage.id);
+      if (index !== -1) {
+        state.messages[index] = updatedMessage;
+      }
+    },
+    removeMessage(state, action) {
+      state.messages = state.messages.filter((message) => message.id !== action.payload);
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchMessagesByChatId.pending, handlePending)
@@ -36,4 +50,5 @@ const messageSlice = createSlice({
   },
 });
 
+export const { addMessage, updateMessage, removeMessage } = messageSlice.actions;
 export const messageReducer = messageSlice.reducer;

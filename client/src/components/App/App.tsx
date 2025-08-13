@@ -5,6 +5,7 @@ import { useAppDispatch } from '../../redux/store';
 import { useSelector } from 'react-redux';
 import { selectIsRefreshing } from '../../redux/auth/selectors';
 import { refreshUser } from '../../redux/auth/operations';
+import { finishAuthProcess } from '../../redux/auth/slice';
 
 import Layout from '../Layout/Layout';
 import RestrictedRoute from '../RestrictedRoute';
@@ -25,6 +26,9 @@ export default function App() {
       .unwrap()
       .catch((error: { message: string }) => {
         toast.error(error.message);
+      })
+      .finally(() => {
+        dispatch(finishAuthProcess());
       });
   }, [dispatch]);
 

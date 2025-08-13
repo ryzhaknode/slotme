@@ -1,5 +1,6 @@
 import createHttpError from 'http-errors';
 import prisma from '../../prisma/prisma.js';
+import { messageInclude } from '../../prisma/includes/messageInclude.js';
 
 export const sendMessage = async (senderId, chatId, { text, files }) => {
   return await prisma.message.create({
@@ -11,7 +12,7 @@ export const sendMessage = async (senderId, chatId, { text, files }) => {
         create: files?.map((f) => ({ url: f.url })),
       },
     },
-    include: { files: true },
+    include: messageInclude,
   });
 };
 
