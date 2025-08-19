@@ -11,6 +11,7 @@ interface IProps {
   handleEditMessage: (message: IMessage) => void;
   handleDeleteMessage: (messageId: string) => void;
   editingMessage: { id: string; text: string } | null;
+  onImageClick: (url: string) => void;
 }
 
 export default function MessagesContainer({
@@ -19,6 +20,7 @@ export default function MessagesContainer({
   handleEditMessage,
   handleDeleteMessage,
   editingMessage,
+  onImageClick,
 }: IProps) {
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
 
@@ -83,7 +85,7 @@ export default function MessagesContainer({
                       src={file.url}
                       alt="attached file"
                       className="w-[260px] h-auto rounded-md object-cover cursor-pointer"
-                      onClick={() => window.open(file.url, '_blank')}
+                      onClick={() => onImageClick(file.url)}
                     />
                   ) : (
                     <a

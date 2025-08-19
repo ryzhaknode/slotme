@@ -12,13 +12,15 @@ import { createMessage, deleteMessage, editeMessage, fetchMessagesByChatId } fro
 import { selectMessages } from '../../redux/message/selectors';
 import { selectUser } from '../../redux/auth/selectors';
 import { addMessage, removeMessage, updateMessage } from '../../redux/message/slice';
+import { addNewUser } from '../../redux/contacts/slice';
 import type { IUser } from '../../types/authTypes';
 import type { IMessage } from '../../types/messageTypes';
 
 import ContactsSidebar from '../../components/ContactsSidebar/ContactsSidebar';
 import MessagesContainer from '../../components/MessagesContainer/MessagesContainer';
 import MessageInputBox from '../../components/MessageInputBox/MessageInputBox';
-import { addNewUser } from '../../redux/contacts/slice';
+import useModal from '../../hooks/useModal';
+import ModalWindow from '../../components/ModalWindow/ModalWindow';
 
 export default function ChatPage() {
   const dispatch = useAppDispatch();
@@ -26,12 +28,15 @@ export default function ChatPage() {
   const { id: chatId, otherUserId } = useSelector(selectChat);
   const messages = useSelector(selectMessages);
   const user = useSelector(selectUser);
+  const { isOpen, openModal, closeModal } = useModal();
 
   const currentUserId = user.id;
 
   const [messageText, setMessageText] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [editingMessage, setEditingMessage] = useState<{ id: string; text: string } | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const textInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -200,37 +205,46 @@ export default function ChatPage() {
     setEditingMessage(null);
   };
 
+  const handleImageClick = (url: string) => {
+    setSelectedImage(url);
+    openModal('image');
+  };
+
   return (
-    <div className="min-w-[360px] max-w-[1046px] mx-auto px-[15px]">
-      <div className="bg-white p-[36px] rounded-[28px] flex gap-6">
-        <ContactsSidebar contacts={contacts} onSelectContact={handleSelectContact} selectedUserId={otherUserId} />
-        <div className="flex-1 flex flex-col">
-          <div className="flex items-center gap-2 mb-[12px]">
-            <MdWhatsapp size={36} className="text-green-500" />
-            <h2 className="text-3xl text-[32px]">Real Time Chat</h2>
-          </div>
-          <MessagesContainer
-            messages={messages}
-            currentUserId={currentUserId}
-            handleEditMessage={handleEditMessage}
-            handleDeleteMessage={handleDeleteMessage}
-            editingMessage={editingMessage}
-          />
-          {chatId && (
-            <MessageInputBox
-              messageText={messageText}
-              onMessageChange={setMessageText}
-              onSend={handleSendMessage}
-              onFileButtonClick={handleFileButtonClick}
-              fileInputRef={fileInputRef}
-              textInputRef={textInputRef}
-              onFileChange={handleFileChange}
-              selectedFiles={selectedFiles}
-              onRemoveFile={handleRemoveFile}
+    <>
+      <div className="min-w-[360px] max-w-[1046px] mx-auto px-[15px]">
+        <div className="bg-white p-[36px] rounded-[28px] flex gap-6">
+          <ContactsSidebar contacts={contacts} onSelectContact={handleSelectContact} selectedUserId={otherUserId} />
+          <div className="flex-1 flex flex-col">
+            <div className="flex items-center gap-2 mb-[12px]">
+              <MdWhatsapp size={36} className="text-green-500" />
+              <h2 className="text-3xl text-[32px]">Real Time Chat</h2>
+            </div>
+            <MessagesContainer
+              messages={messages}
+              currentUserId={currentUserId}
+              handleEditMessage={handleEditMessage}
+              handleDeleteMessage={handleDeleteMessage}
+              editingMessage={editingMessage}
+              onImageClick={handleImageClick}
             />
-          )}
+            {chatId && (
+              <MessageInputBox
+                messageText={messageText}
+                onMessageChange={setMessageText}
+                onSend={handleSendMessage}
+                onFileButtonClick={handleFileButtonClick}
+                fileInputRef={fileInputRef}
+                textInputRef={textInputRef}
+                onFileChange={handleFileChange}
+                selectedFiles={selectedFiles}
+                onRemoveFile={handleRemoveFile}
+              />
+            )}
+          </div>
         </div>
       </div>
-    </div>
+      {selectedImage && <ModalWindow isOpen={isOpen} onClose={closeModal} imageUrl={selectedImage} />}
+    </>
   );
 }
