@@ -5,12 +5,16 @@ const regex = {
 };
 
 export const signUpSchema = yup.object().shape({
-  name: yup.string().required('Name is required').min(3, 'Name must be at least 3 characters'),
-  email: yup.string().required('Email is required').matches(regex.emailRegexp, 'Invalid email. Example: user@mail.com'),
-  password: yup.string().required('Password is required').min(6, 'Password must be at least 6 characters'),
+  name: yup.string().required('Ім\'я обов\'язкове').min(3, 'Ім\'я має містити мінімум 3 символи'),
+  email: yup.string().required('Email обов\'язковий').matches(regex.emailRegexp, 'Невірний email. Приклад: user@mail.com'),
+  password: yup.string().required('Пароль обов\'язковий').min(6, 'Пароль має містити мінімум 6 символів'),
 });
 
 export const singInSchema = yup.object().shape({
-  email: yup.string().required('Email is required').matches(regex.emailRegexp, 'Invalid email. Example: user@mail.com'),
-  password: yup.string().required('Password is required').min(6, 'Password must be at least 6 characters'),
+  email: yup.string().required('Email обов\'язковий').matches(regex.emailRegexp, 'Невірний email. Приклад: user@mail.com'),
+  password: yup.string().required('Пароль обов\'язковий').min(6, 'Пароль має містити мінімум 6 символів'),
+});
+
+export const emailOnlySchema = yup.object().shape({
+  email: yup.string().required('Email обов\'язковий').matches(regex.emailRegexp, 'Невірний email. Приклад: user@mail.com'),
 });

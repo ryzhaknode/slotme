@@ -20,14 +20,21 @@ const ChatPage = lazy(() => import('../../pages/ChatPage/ChatPage'));
 export default function App() {
   const dispatch = useAppDispatch();
   const isRefreshing = useSelector(selectIsRefreshing);
+  const refreshToken = useSelector((state: any) => state.auth.refreshToken);
 
   useEffect(() => {
-    dispatch(refreshUser())
-      .unwrap()
-      .finally(() => {
-        dispatch(finishAuthProcess());
-      });
-  }, [dispatch]);
+    // Вызываем refreshUser только если есть refreshToken
+    if (refreshToken) {
+      dispatch(refreshUser())
+        .unwrap()
+        .finally(() => {
+          dispatch(finishAuthProcess());
+        });
+    } else {
+      // Если нет refreshToken, сразу завершаем процесс аутентификации
+      dispatch(finishAuthProcess());
+    }
+  }, [dispatch, refreshToken]);
 
   return isRefreshing ? (
     <CustomLoader />

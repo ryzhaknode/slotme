@@ -1,15 +1,13 @@
-import createHttpError from 'http-errors';
-
-export const validateParams = (schema) => async (req, res, next) => {
-  try {
-    await schema.validateAsync(req.params, {
-      abortEarly: false,
+export const validateParams = (req, res, next) => {
+  // Простая валидация параметров
+  const params = req.params || {};
+  const { id } = params;
+  if (!id) {
+    return res.status(400).json({
+      status: 'error',
+      code: 400,
+      message: 'ID parameter is required'
     });
-    next();
-  } catch (error) {
-    const responseError = createHttpError(400, 'Bad Request', {
-      errors: error.details,
-    });
-    next(responseError);
   }
+  next();
 };

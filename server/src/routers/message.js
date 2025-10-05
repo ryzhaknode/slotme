@@ -11,7 +11,7 @@ const router = Router();
 router.post(
   '/create/:chatId',
   authenticate,
-  validateParams(fetchMessagesSchema),
+  validateParams,
   upload.array('files'),
   ctrlWrapper(sendMessageController),
 );
@@ -19,7 +19,7 @@ router.post(
 router.put(
   '/update/:id',
   authenticate,
-  validateParams(updateMessageSchema),
+  validateParams,
   upload.array('files'),
   ctrlWrapper(updateMessageController),
 );

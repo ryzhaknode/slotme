@@ -4,8 +4,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("POSTGRES_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 model User {
@@ -17,6 +17,7 @@ model User {
   chatsUserOne            Chat[]        @relation("ChatUserOne")
   chatsUserTwo            Chat[]        @relation("ChatUserTwo")
   messages                Message[]     @relation("UserMessages")
+  bookings                Booking[]
   createdAt               DateTime      @default(now()) @map("created_at")
   updatedAt               DateTime      @updatedAt @map("updated_at")
 }
@@ -62,4 +63,31 @@ model File {
   url                     String
   messageId               String
   message                 Message       @relation(fields: [messageId], references: [id], onDelete: Cascade)
+}
+
+model Service {
+  id                      String        @id @default(uuid())
+  name                    String
+  description             String
+  duration                String?
+  price                   String?
+  isActive                Boolean       @default(true)
+  bookings                Booking[]
+  createdAt               DateTime      @default(now()) @map("created_at")
+  updatedAt               DateTime      @updatedAt @map("updated_at")
+}
+
+model Booking {
+  id                      String        @id @default(uuid())
+  date                    DateTime
+  startTime               String
+  endTime                 String
+  serviceId               String
+  service                 Service       @relation(fields: [serviceId], references: [id])
+  userId                  String
+  user                    User          @relation(fields: [userId], references: [id])
+  createdAt               DateTime      @default(now()) @map("created_at")
+  updatedAt               DateTime      @updatedAt @map("updated_at")
+
+  @@unique([date, startTime, endTime])
 }

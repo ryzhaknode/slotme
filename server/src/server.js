@@ -33,7 +33,7 @@ export const startServer = () => {
 
   app.use(cors(corsOptions));
 
-  app.use(router);
+  app.use('/api', router);
 
   app.use(/(.*)/, notFoundHandler);
 

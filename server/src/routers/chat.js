@@ -10,6 +10,6 @@ import { fetchMessagesSchema } from '../validation/message.js';
 const router = Router();
 
 router.post('/create', authenticate, validateBody(createChatSchema), ctrlWrapper(createChatController));
-router.get('/:chatId/messages', authenticate, validateParams(fetchMessagesSchema), ctrlWrapper(getMessagesController));
+router.get('/:chatId/messages', authenticate, validateParams, ctrlWrapper(getMessagesController));
 
 export default router;

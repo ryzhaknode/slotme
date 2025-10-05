@@ -73,12 +73,5 @@ export const refreshUser = createAsyncThunk<IAuthResponse, void, { state: RootSt
       const errorMessage = handleError(error);
       return thunkAPI.rejectWithValue({ message: errorMessage });
     }
-  },
-  {
-    condition(_, thunkAPI) {
-      const reduxState = thunkAPI.getState();
-      const savedRefreshToken = reduxState.auth.refreshToken;
-      return savedRefreshToken !== null;
-    },
-  },
+  }
 );
