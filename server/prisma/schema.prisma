@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id                      String        @id @default(uuid())
+  name                    String
+  email                   String        @unique
+  password                String
+  sessions                Session[]
+  chatsUserOne            Chat[]        @relation("ChatUserOne")
+  chatsUserTwo            Chat[]        @relation("ChatUserTwo")
+  messages                Message[]     @relation("UserMessages")
+  bookings                Booking[]
+  createdAt               DateTime      @default(now()) @map("created_at")
+  updatedAt               DateTime      @updatedAt @map("updated_at")
+}
+
+model Session {
+  id                      String        @id @default(uuid())
+  accessToken             String        @unique
+  refreshToken            String        @unique
+  accessTokenValidUntil   DateTime
+  refreshTokenValidUntil  DateTime
+  userId                  String
+  user                    User          @relation(fields: [userId], references: [id])
+  createdAt               DateTime      @default(now()) @map("created_at")
+  updatedAt               DateTime      @updatedAt @map("updated_at")
+
+  @@index([userId])
+}
+
+model Chat {
+  id                      String        @id @default(uuid())
+  userOneId               String
+  userTwoId               String
+  userOne                 User          @relation("ChatUserOne", fields: [userOneId], references: [id])
+  userTwo                 User          @relation("ChatUserTwo", fields: [userTwoId], references: [id])
+  messages                Message[]
+  createdAt               DateTime      @default(now()) @map("created_at")
+}
+
+model Message {
+  id                      String        @id @default(uuid())
+  text                    String?
+  senderId                String
+  sender                  User          @relation("UserMessages", fields: [senderId], references: [id])
+  chatId                  String
+  chat                    Chat          @relation(fields: [chatId], references: [id])
+  files                   File[]
+  createdAt               DateTime      @default(now()) @map("created_at")
+  updatedAt               DateTime      @updatedAt @map("updated_at")
+}
+
+model File {
+  id                      String        @id @default(uuid())
+  url                     String
+  messageId               String
+  message                 Message       @relation(fields: [messageId], references: [id], onDelete: Cascade)
+}
+
+model Service {
+  id                      String        @id @default(uuid())
+  name                    String
+  description             String
+  duration                String?
+  price                   String?
+  isActive                Boolean       @default(true)
+  bookings                Booking[]
+  createdAt               DateTime      @default(now()) @map("created_at")
+  updatedAt               DateTime      @updatedAt @map("updated_at")
+}
+
+model Booking {
+  id                      String        @id @default(uuid())
+  date                    DateTime
+  startTime               String
+  endTime                 String
+  serviceId               String
+  service                 Service       @relation(fields: [serviceId], references: [id])
+  userId                  String
+  user                    User          @relation(fields: [userId], references: [id])
+  createdAt               DateTime      @default(now()) @map("created_at")
+  updatedAt               DateTime      @updatedAt @map("updated_at")
+
+  @@unique([date, startTime, endTime])
+}
