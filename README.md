@@ -1,18 +1,18 @@
-# Real Time Chat
+# SlotMe
 
-This is a real-time chat application built with **Node.js**, **Express**, **React (Vite)**, **Socket.IO**, **PostgreSQL**, and **Prisma**. The project is fully dockerized for easy development and deployment.
+SlotMe — сервіс для керування послугами та бронюванням. Стек: **Node.js**, **Express**, **React (Vite)**, **Socket.IO**, **SQLite (Prisma)**. Проєкт має Docker-конфіг для зручної розробки.
 
 ## Prerequisites
 
 - Docker & Docker Compose
 - Node.js v20+
 - npm or yarn
-- PostgreSQL (optional if using Docker)
+-- (SQLite за замовчуванням через Prisma)
 
 ## Project Structure
 
 ```
-real-time-chat
+slotme
 ├── client
 │   ├── src
 │   ├── Dockerfile
@@ -52,7 +52,7 @@ POSTGRES_URL=postgresql://user:password@localhost:5432/dbname?schema=public
 | -------- | ---- |
 | Client   | 5173 |
 | Server   | 3000 |
-| Database | 5432 |
+| Prisma Studio | 5555 |
 
 ## Docker Setup
 
@@ -62,9 +62,8 @@ POSTGRES_URL=postgresql://user:password@localhost:5432/dbname?schema=public
 docker-compose --env-file ./server/.env up
 ```
 
-This will start three services:
+This will start services:
 
-- db: PostgreSQL database
 - server: Node.js backend
 - client: React frontend
 
@@ -80,7 +79,7 @@ docker-compose --env-file ./server/.env down
 
 ```bash
 npx prisma generate       # Generate Prisma client
-npx prisma migrate dev    # Apply migrations to the database
+npx prisma migrate dev    # Apply migrations
 ```
 
 ## Scripts

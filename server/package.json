@@ -1,7 +1,7 @@
 {
-  "name": "server",
+  "name": "slotme-server",
   "version": "1.0.0",
-  "description": "",
+  "description": "SlotMe backend API (Express, Prisma, SQLite)",
   "main": "index.js",
   "type": "module",
   "scripts": {
