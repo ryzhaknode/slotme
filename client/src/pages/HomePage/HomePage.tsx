@@ -1,4 +1,3 @@
-import { MdWhatsapp } from 'react-icons/md';
 import { useState } from 'react';
 import HeroSlider from '../../components/HeroSlider/HeroSlider';
 import LoginOverlay from '../../components/LoginOverlay/LoginOverlay';
@@ -27,9 +26,7 @@ export default function HomePage() {
     setActiveButton('booking');
   };
 
-  const handleBackToServices = () => {
-    setShowDateMenu(false);
-  };
+
 
   const handleShowServices = () => {
     setShowDateMenu(false);

@@ -30,3 +30,7 @@ export interface IAuthResponse {
 export interface IErrorResponse {
   message: string;
 }
+
+export interface ISendCodeResponse {
+  previewUrl: string | null;
+}

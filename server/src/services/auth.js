@@ -4,63 +4,9 @@ import createHttpError from 'http-errors';
 import { normalizeEmail } from '../utils/normalizeEmail.js';
 import { createSession } from '../utils/createSession.js';
 import { parseToken } from '../utils/parseToken.js';
+import crypto from 'crypto';
 
-export const registerUser = async (payload) => {
-  const normalizedEmail = normalizeEmail(payload.email);
-
-  const existingUser = await prisma.user.findUnique({
-    where: { email: normalizedEmail },
-  });
-
-  if (existingUser) throw createHttpError(409, 'Email in use');
-
-  const encryptedPassword = await bcrypt.hash(payload.password, 10);
-
-  return await prisma.user.create({
-    data: {
-      ...payload,
-      email: normalizedEmail,
-      password: encryptedPassword,
-    },
-  });
-};
-
-export const loginUser = async (payload) => {
-  const normalizedEmail = normalizeEmail(payload.email);
-
-  const existingUser = await prisma.user.findUnique({
-    where: { email: normalizedEmail },
-  });
-
-  if (!existingUser) {
-    throw createHttpError(404, 'User not found');
-  }
-
-  const isEqual = await bcrypt.compare(payload.password, existingUser.password);
-
-  if (!isEqual) {
-    throw createHttpError(401, 'Invalid email or password');
-  }
-
-  await prisma.session.deleteMany({
-    where: { userId: existingUser.id },
-  });
-
-  const newSession = createSession(existingUser.id);
-
-  const session = await prisma.session.create({
-    data: { ...newSession },
-  });
-
-  return {
-    user: {
-      id: existingUser.id,
-      name: existingUser.name,
-      email: existingUser.email,
-    },
-    session,
-  };
-};
+// removed unused register/login flows; using code-based auth
 
 export const logoutUser = async (accessToken) => {
   const session = await prisma.session.findUnique({
@@ -117,5 +63,75 @@ export const refreshUsersSession = async ({ refreshToken }) => {
       email: existingUser.email,
     },
     newSession: newCreatedSession,
+  };
+};
+
+export const createOrReuseVerificationCode = async (email) => {
+  const normalizedEmail = normalizeEmail(email);
+
+  const existing = await prisma.verificationCode.findFirst({
+    where: {
+      email: normalizedEmail,
+      consumed: false,
+      expiresAt: { gt: new Date() },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  if (existing) return existing;
+
+  const code = (Math.floor(100000 + Math.random() * 900000)).toString();
+  const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+  return prisma.verificationCode.create({
+    data: {
+      email: normalizedEmail,
+      code,
+      expiresAt,
+    },
+  });
+};
+
+export const verifyEmailCodeAndLogin = async ({ email, code }) => {
+  const normalizedEmail = normalizeEmail(email);
+
+  const record = await prisma.verificationCode.findFirst({
+    where: {
+      email: normalizedEmail,
+      code,
+      consumed: false,
+      expiresAt: { gt: new Date() },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  if (!record) {
+    throw createHttpError(400, 'Invalid or expired code');
+  }
+
+  await prisma.verificationCode.update({
+    where: { id: record.id },
+    data: { consumed: true },
+  });
+
+  let user = await prisma.user.findUnique({ where: { email: normalizedEmail } });
+
+  if (!user) {
+    user = await prisma.user.create({
+      data: {
+        email: normalizedEmail,
+        name: normalizedEmail.split('@')[0],
+        password: await bcrypt.hash(crypto.randomBytes(16).toString('hex'), 10),
+      },
+    });
+  }
+
+  await prisma.session.deleteMany({ where: { userId: user.id } });
+  const newSession = createSession(user.id);
+  const session = await prisma.session.create({ data: { ...newSession } });
+
+  return {
+    user: { id: user.id, name: user.name, email: user.email },
+    session,
   };
 };

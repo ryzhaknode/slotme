@@ -91,3 +91,14 @@ model Booking {
 
   @@unique([date, startTime, endTime])
 }
+
+model VerificationCode {
+  id          String   @id @default(uuid())
+  email       String
+  code        String
+  expiresAt   DateTime
+  consumed    Boolean  @default(false)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([email])
+}

@@ -24,3 +24,21 @@ export const loginUserSchema = Joi.object({
   'string.email': 'Field {#label} must be a valid email address.',
   'any.required': 'missing required {#label} field',
 });
+
+export const sendCodeSchema = Joi.object({
+  email: Joi.string().pattern(emailRegexp).required(),
+}).messages({
+  'string.base': 'Field {#label} must be a string.',
+  'string.empty': 'Field {#label} cannot be empty.',
+  'string.email': 'Field {#label} must be a valid email address.',
+  'any.required': 'missing required {#label} field',
+});
+
+export const verifyCodeSchema = Joi.object({
+  email: Joi.string().pattern(emailRegexp).required(),
+  code: Joi.string().length(6).required(),
+}).messages({
+  'string.base': 'Field {#label} must be a string.',
+  'string.empty': 'Field {#label} cannot be empty.',
+  'any.required': 'missing required {#label} field',
+});

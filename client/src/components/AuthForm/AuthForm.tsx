@@ -1,13 +1,11 @@
 import toast from 'react-hot-toast';
 import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { logIn, register } from '../../redux/auth/operations';
-import { singInSchema, emailOnlySchema } from '../../utils/validationSchemas';
-import type { IAuthFormValues } from '../../types/authTypes';
-import { useAppDispatch } from '../../redux/store';
+import { emailOnlySchema } from '../../utils/validationSchemas';
+import { useAuthStore } from '@/store/auth';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, X as CloseIcon } from 'lucide-react';
 
 import InputField from '../InputField/InputField';
 import GoogleIcon from '../icons/GoogleIcon';
@@ -20,9 +18,10 @@ type Props = {
 };
 
 export default function AuthForm({ type, onClose }: Props) {
-  const dispatch = useAppDispatch();
-  const [step, setStep] = useState<'email' | 'password'>('email');
+  const { sendLoginCode, verifyLoginCode } = useAuthStore();
+  const [step, setStep] = useState<'email' | 'code' | 'password'>('email');
   const [email, setEmail] = useState('');
+  const [code, setCode] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
   const emailMethods = useForm({
@@ -31,33 +30,65 @@ export default function AuthForm({ type, onClose }: Props) {
     reValidateMode: 'onChange',
   });
 
-  const passwordMethods = useForm<IAuthFormValues>({
-    resolver: yupResolver(singInSchema),
-    mode: 'onTouched',
-    reValidateMode: 'onChange',
-  });
+  const showErrorToast = (message: string) =>
+    toast.custom(
+      <div className="flex items-start gap-3 rounded-md border border-red-200 bg-white px-4 py-3 shadow-md">
+        <div className="mt-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-red-500">
+          <CloseIcon size={14} className="text-white" />
+        </div>
+        <div className="text-sm text-red-700">{message}</div>
+      </div>
+    );
+
+  const passwordMethods = useForm({ mode: 'onTouched', reValidateMode: 'onChange' });
 
   const handleEmailSubmit = (data: { email: string }) => {
-    setEmail(data.email);
-    setStep('password');
-    emailMethods.reset();
+    const nextEmail = data.email;
+    setEmail(nextEmail);
+    // Optimistic success UI: show success and go to code step immediately
+    toast.success('Код надіслано на вашу електронну пошту');
+    setStep('code');
+    // use zustand action
+    Promise.resolve(sendLoginCode(nextEmail))
+      .then((resp: any) => {
+        if (resp.previewUrl) window.open(resp.previewUrl, '_blank', 'noopener,noreferrer');
+        emailMethods.reset();
+      })
+      .catch((err: any) => showErrorToast(err.message || String(err)));
   };
 
-  const handlePasswordSubmit = (data: IAuthFormValues) => {
-    const userData = { ...data, email };
-    const action = type === 'register' ? register(userData) : logIn(userData);
-    dispatch(action)
-      .unwrap()
-      .then(() => {
-        passwordMethods.reset();
-      })
-      .catch((error: { message: string }) => {
-        toast.error(error.message);
-      });
+  const handlePasswordSubmit = () => {
+    toast.error('Парольна авторизація відключена. Використайте код із пошти.');
   };
 
   const handleSendCode = () => {
-    toast.success('Код надіслано на вашу електронну пошту');
+    if (!email) {
+      toast.error('Введіть email спочатку');
+      return;
+    }
+    // Optimistic success UI on resend
+    toast.success('Код повторно надіслано');
+    setStep('code');
+    Promise.resolve(sendLoginCode(email))
+      .then((data: any) => {
+        if (data.previewUrl) window.open(data.previewUrl, '_blank', 'noopener,noreferrer');
+      })
+      .catch((err: any) => showErrorToast(err.message || String(err)));
+  };
+
+  const handleVerifyCode = () => {
+    if (!code || code.length !== 6) {
+      toast.error('Введіть 6-значний код');
+      return;
+    }
+    Promise.resolve(verifyLoginCode(email, code))
+      .then(() => {
+        passwordMethods.reset();
+        toast.success('Ви успішно зайшли в кабінет');
+      })
+      .catch((error: any) => {
+        showErrorToast(error.message || String(error));
+      });
   };
 
   if (step === 'email') {
@@ -109,17 +140,55 @@ export default function AuthForm({ type, onClose }: Props) {
             <InputField name="email" type="email" placeholder="Ваша електронна адреса" />
           </div>
 
-          {/* Continue Button */}
+          {/* Send Code (submit email) */}
           <div className="animate-fly-in-from-top">
             <button
               type="submit"
               className="w-full bg-orange text-black font-bold py-4 rounded-lg hover:bg-orange-600 transition-colors"
             >
-              Далі
+              Надіслати код
             </button>
           </div>
         </form>
       </FormProvider>
+    );
+  }
+
+  if (step === 'code') {
+    return (
+      <div>
+        {onClose && (
+          <div className="absolute top-4 right-4 z-10">
+            <CloseButton onClick={onClose} animation="from-top" />
+          </div>
+        )}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-center mb-2">Введіть код</h2>
+          <p className="text-gray-500 text-center">Ми надіслали код на {email}</p>
+        </div>
+        <div className="mb-6">
+          <input
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            maxLength={6}
+            value={code}
+            onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
+            placeholder="6-значний код"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange focus:border-transparent"
+          />
+        </div>
+        <div className="animate-fly-in-from-top">
+          <Button type="button" onClick={handleVerifyCode} className="w-full bg-orange text-white py-3 rounded-lg mb-6">
+            Підтвердити
+          </Button>
+        </div>
+        <div className="text-center">
+          <button type="button" onClick={handleSendCode} className="text-orange hover:underline">
+            Надіслати код ще раз
+          </button>
+        </div>
+      </div>
     );
   }
 
@@ -157,8 +226,8 @@ export default function AuthForm({ type, onClose }: Props) {
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
           </div>
-          {passwordMethods.formState.errors.password && (
-            <p className="text-red-500 text-sm mt-1">{passwordMethods.formState.errors.password.message}</p>
+          {typeof passwordMethods.formState.errors.password?.message === 'string' && (
+            <p className="text-red-500 text-sm mt-1">{passwordMethods.formState.errors.password?.message}</p>
           )}
         </div>
 
@@ -184,8 +253,9 @@ export default function AuthForm({ type, onClose }: Props) {
             type="button"
             onClick={handleSendCode}
             className="w-full bg-orange text-white py-3 rounded-lg mb-6"
+            aria-label="Надіслати код"
           >
-            Надішліть мені код на електронну пошту
+            Надіслати код
           </Button>
         </div>
 

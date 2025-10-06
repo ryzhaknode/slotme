@@ -1,9 +1,6 @@
 import axios from 'axios';
-
-import { getStoreOrThrow } from './refreshHandler.ts';
-import { clearTokens } from '../redux/auth/slice.ts';
-import { refreshUser } from '../redux/auth/operations.ts';
-import type { AppDispatch } from '../redux/store.ts';
+import { getAccessTokenFromCookie } from './tokenCookie.ts';
+import { useAuthStore } from '@/store/auth';
 
 const instance = axios.create({
   baseURL: 'http://localhost:3000',
@@ -25,25 +22,29 @@ instance.interceptors.response.use(
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-
-      const store = getStoreOrThrow();
-      const dispatch = store.dispatch as AppDispatch;
-
       try {
-        const { accessToken } = await dispatch(refreshUser()).unwrap();
-
-        setAuthHeader(accessToken);
-        originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
-
-        return instance(originalRequest);
+        const refreshed = await useAuthStore.getState().refresh();
+        if (refreshed?.accessToken) {
+          setAuthHeader(refreshed.accessToken);
+          originalRequest.headers['Authorization'] = `Bearer ${refreshed.accessToken}`;
+          return instance(originalRequest);
+        }
       } catch (refreshError) {
         console.error('Failed to refresh token', refreshError);
-        dispatch(clearTokens());
       }
     }
 
     return Promise.reject(error);
   },
 );
+
+// Attach token from cookie on each request if header not set
+instance.interceptors.request.use((config) => {
+  if (!config.headers['Authorization']) {
+    const token = getAccessTokenFromCookie();
+    if (token) config.headers['Authorization'] = `Bearer ${token}`;
+  }
+  return config;
+});
 
 export default instance;

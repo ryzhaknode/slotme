@@ -3,12 +3,17 @@ import { Button } from '@/components/ui/button';
 import { User, X } from 'lucide-react';
 import AuthForm from '../AuthForm/AuthForm';
 import BurgerMenu from '../BurgerMenu/BurgerMenu';
+import AccountDrawer from '../AccountDrawer/AccountDrawer';
+import { useAuthStore } from '@/store/auth';
 
 export default function LoginOverlay() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
 
   const handleAuthClick = () => {
-    setIsAuthOpen(true);
+    if (isLoggedIn) setIsAccountOpen(true);
+    else setIsAuthOpen(true);
   };
 
   const handleClose = () => {
@@ -34,7 +39,7 @@ export default function LoginOverlay() {
       </div>
 
       {/* Auth Slider - Slides in from right */}
-      {isAuthOpen && (
+      {!isLoggedIn && isAuthOpen && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 animate-in fade-in duration-300">
           <div className="absolute right-0 top-0 h-full w-4/5 bg-white shadow-2xl animate-in slide-in-from-right duration-300">
             {/* Auth Content */}
@@ -55,6 +60,9 @@ export default function LoginOverlay() {
           </div>
         </div>
       )}
+
+      {/* Account Drawer - Slides in from left */}
+      {isLoggedIn && <AccountDrawer open={isAccountOpen} onClose={() => setIsAccountOpen(false)} />}
     </>
   );
 }
