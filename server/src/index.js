@@ -12,9 +12,10 @@ const bootstrap = async () => {
   const app = startServer();
   const server = http.createServer(app);
 
+  const corsOrigin = env('CORS_ORIGIN', '*');
   const io = new IOServer(server, {
     cors: {
-      origin: 'http://localhost:5173',
+      origin: corsOrigin === '*' ? true : corsOrigin,
       methods: ['GET', 'POST', 'PUT', 'DELETE'],
       credentials: true,
     },

@@ -7,6 +7,7 @@ import { notFoundHandler } from './middlewares/notFoundHandler.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 
 import router from './routers/index.js';
+import { env } from './utils/env.js';
 
 dotenv.config({ quiet: true });
 
@@ -26,12 +27,13 @@ export const startServer = () => {
     }),
   );
 
-  const corsOptions = {
-    origin: 'http://localhost:5173',
-    credentials: true,
-  };
-
-  app.use(cors(corsOptions));
+  const corsOrigin = env('CORS_ORIGIN', '*');
+  app.use(
+    cors({
+      origin: corsOrigin === '*' ? true : corsOrigin,
+      credentials: true,
+    }),
+  );
 
   app.use('/api', router);
 

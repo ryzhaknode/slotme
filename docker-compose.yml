@@ -1,33 +1,17 @@
 services:
-  db:
-    image: postgres:15
-    restart: always
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    ports:
-      - '5432:5432'
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-
   server:
     build: ./server
     restart: always
     env_file:
       - ./server/.env
-    depends_on:
-      - db
-    environment:
-      DATABASE_URL: ${POSTGRES_URL}
-    ports:
-      - '3000:3000'
+    volumes:
+      - ./server/uploads:/app/uploads
+      - ./server/prisma/dev.db:/app/prisma/dev.db
 
   client:
     build: ./client
     restart: always
+    depends_on:
+      - server
     ports:
-      - '5173:5173'
-
-volumes:
-  pgdata:
+      - '80:80'

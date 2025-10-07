@@ -41,8 +41,8 @@ export default function HeroSlider({ images }: HeroSliderProps) {
         spaceBetween={0}
         slidesPerView={1}
         navigation={{
-          nextEl: '.swiper-button-next',
-          prevEl: '.swiper-button-prev',
+          nextEl: '.custom-button-next',
+          prevEl: '.custom-button-prev',
         }}
         pagination={false}
         effect="fade"
@@ -74,13 +74,13 @@ export default function HeroSlider({ images }: HeroSliderProps) {
       </Swiper>
       
       {/* Custom Navigation Buttons - positioned absolutely over the slider */}
-      <div className={`swiper-button-prev absolute !text-white !w-10 !h-10 !bg-black/30 !rounded-lg hover:!bg-black/50 transition-all duration-300 !left-4 !top-1/2 !-translate-y-1/2 !z-20 !flex !items-center !justify-center !backdrop-blur-md ${isBeginning ? '!opacity-50 !cursor-not-allowed' : '!opacity-100'}`} style={{ top: '50%', transform: 'translateY(-50%)' }}>
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className={`custom-button-prev absolute !text-white !w-10 !h-10 !bg-black/30 !rounded-lg hover:!bg-black/50 transition-all duration-300 !left-4 !top-1/2 !-translate-y-1/2 !z-20 !flex !items-center !justify-center !backdrop-blur-md ${isBeginning ? '!opacity-50 !cursor-not-allowed' : '!opacity-100'}`} style={{ top: '50%', transform: 'translateY(-50%)' }}>
+        <svg className="w-5 h-5" fill="none" stroke="white" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
       </div>
-      <div className={`swiper-button-next absolute !text-white !w-10 !h-10 !bg-black/30 !rounded-lg hover:!bg-black/50 transition-all duration-300 !right-4 !top-1/2 !-translate-y-1/2 !z-20 !flex !items-center !justify-center !backdrop-blur-md ${isEnd ? '!opacity-50 !cursor-not-allowed' : '!opacity-100'}`} style={{ top: '50%', transform: 'translateY(-50%)' }}>
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className={`custom-button-next absolute !text-white !w-10 !h-10 !bg-black/30 !rounded-lg hover:!bg-black/50 transition-all duration-300 !right-4 !top-1/2 !-translate-y-1/2 !z-20 !flex !items-center !justify-center !backdrop-blur-md ${isEnd ? '!opacity-50 !cursor-not-allowed' : '!opacity-100'}`} style={{ top: '50%', transform: 'translateY(-50%)' }}>
+        <svg className="w-5 h-5" fill="none" stroke="white" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
       </div>
