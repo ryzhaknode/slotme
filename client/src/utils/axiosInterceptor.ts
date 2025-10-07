@@ -3,7 +3,7 @@ import { getAccessTokenFromCookie } from './tokenCookie.ts';
 import { useAuthStore } from '@/store/auth';
 
 const instance = axios.create({
-  baseURL: 'http://localhost:3000',
+  baseURL: '',
   withCredentials: true,
 });
 
