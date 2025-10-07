@@ -12,7 +12,11 @@ RUN npm run build
 
 FROM nginx:alpine
 
+# Copy built static files
 COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Add nginx config with reverse proxy for /api and websocket upgrades
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 

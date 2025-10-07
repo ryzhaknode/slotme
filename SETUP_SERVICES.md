@@ -1,11 +1,23 @@
-# Настройка API для услуг
+# Настройка и деплой
 
-## 1. Настройка базы данных
+## 1) Быстрый деплой (Docker)
 
-### Создайте .env файл в папке server:
-```bash
-POSTGRES_URL="postgresql://username:password@localhost:5432/real_time_chat"
+Требования: Docker и docker-compose на сервере.
+
+### Подготовьте `server/.env`:
 ```
+PORT=3000
+CORS_ORIGIN=*
+DATABASE_URL="file:./dev.db"
+```
+
+### Запуск:
+```
+docker compose build
+docker compose up -d
+```
+
+Клиент доступен на 80 порту, API проксируется по `/api`, WebSocket — `/socket.io`.
 
 ## 2. Установка зависимостей
 
@@ -31,7 +43,7 @@ npx prisma generate
 npm run seed
 ```
 
-## 5. Запуск сервера
+## 5. Запуск сервера (локально)
 
 ```bash
 # В режиме разработки
