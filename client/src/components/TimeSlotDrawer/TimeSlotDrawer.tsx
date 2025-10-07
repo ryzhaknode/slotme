@@ -202,7 +202,7 @@ export default function TimeSlotDrawer({
 
   return (
     <Drawer open={isOpen} onOpenChange={onClose}>
-      <DrawerContent className="h-[90vh] flex flex-col">
+      <DrawerContent className="flex flex-col">
         <DrawerHeader className="pb-4 shrink-0">
           <div className="flex items-start justify-end">
             <DrawerClose asChild>
@@ -296,7 +296,7 @@ export default function TimeSlotDrawer({
 
       {/* Auth Drawer for unauthenticated users */}
       <Drawer open={isAuthDrawerOpen} onOpenChange={(open) => { setIsAuthDrawerOpen(open); if (!open) setAuthStep('email'); }}>
-        <DrawerContent className="h-[90vh] flex flex-col">
+        <DrawerContent className="flex flex-col">
           <DrawerHeader className="pb-4 shrink-0">
             <div className="flex items-start justify-end">
               <DrawerClose asChild>

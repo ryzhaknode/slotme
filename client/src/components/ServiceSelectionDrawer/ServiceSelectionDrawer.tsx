@@ -37,7 +37,7 @@ export default function ServiceSelectionDrawer({
 
   return (
     <Drawer open={isOpen} onOpenChange={onClose}>
-      <DrawerContent className="max-h-[90vh]">
+      <DrawerContent>
         <DrawerHeader className="pb-4">
           <div className="flex items-center justify-between">
             <DrawerTitle className="text-xl font-semibold">

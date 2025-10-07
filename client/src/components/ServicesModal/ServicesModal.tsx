@@ -18,7 +18,7 @@ interface ServicesModalProps {
 export default function ServicesModal({ isOpen, onClose, serviceTitle, serviceDescription, onBookService }: ServicesModalProps) {
   return (
     <Drawer open={isOpen} onOpenChange={onClose}>
-      <DrawerContent className="h-[80vh]">
+      <DrawerContent>
         <div className="relative h-full w-full flex flex-col pb-5">
           {/* Close Button - Top Right */}
           <div className="absolute top-0 right-4 z-10">
