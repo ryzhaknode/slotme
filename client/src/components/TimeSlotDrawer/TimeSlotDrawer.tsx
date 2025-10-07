@@ -203,7 +203,7 @@ export default function TimeSlotDrawer({
   return (
     <Drawer open={isOpen} onOpenChange={onClose}>
       <DrawerContent className="flex flex-col">
-        <DrawerHeader className="pb-4 shrink-0">
+        <DrawerHeader className="pb-2 shrink-0">
           <div className="flex items-start justify-end">
             <DrawerClose asChild>
               <CloseButton 

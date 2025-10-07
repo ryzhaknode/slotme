@@ -1,7 +1,7 @@
 import { X } from 'lucide-react';
 
 interface CloseButtonProps {
-  onClick: () => void;
+  onClick?: () => void;
   size?: 'xs' | 'sm' | 'md' | 'lg';
   animation?: 'from-top' | 'from-right';
   className?: string;
@@ -29,7 +29,7 @@ export default function CloseButton({ onClick, size = 'md', animation = 'from-to
 
   return (
     <button
-      onClick={onClick}
+      onClick={onClick ?? (() => {})}
       className={`${sizeClasses[size]} bg-orange text-black hover:bg-orange-600 transition-all duration-300 rounded-lg flex items-center justify-center ${animationClasses[animation]} ${className}`}
     >
       <X size={iconSizes[size]} />
