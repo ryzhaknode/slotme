@@ -302,7 +302,7 @@ export default function TimeSlotDrawer({
               <DrawerClose asChild>
                 <CloseButton 
                   onClick={() => { setIsAuthDrawerOpen(false); setShouldBookAfterAuth(false); setAuthStep('email'); }} 
-                  size="sm" 
+                  size="xs" 
                   animation="from-right"
                 />
               </DrawerClose>
