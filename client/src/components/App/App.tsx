@@ -11,12 +11,16 @@ const HomePage = lazy(() => import('../../pages/HomePage/HomePage'));
 export default function App() {
   const [bootRefreshing, setBootRefreshing] = useState(true);
   const refresh = useAuthStore((s) => s.refresh);
+  const hydrateFromCookie = useAuthStore((s) => s.hydrateFromCookie);
 
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
-        await refresh();
+        const hydrated = await hydrateFromCookie();
+        if (!hydrated) {
+          await refresh();
+        }
       } finally {
         if (mounted) setBootRefreshing(false);
       }
@@ -24,7 +28,7 @@ export default function App() {
     return () => {
       mounted = false;
     };
-  }, [refresh]);
+  }, [refresh, hydrateFromCookie]);
 
   return bootRefreshing ? (
     <CustomLoader />

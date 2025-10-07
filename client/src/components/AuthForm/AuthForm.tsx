@@ -15,9 +15,12 @@ import CloseButton from '../CloseButton/CloseButton';
 type Props = {
   type: 'login' | 'register';
   onClose?: () => void;
+  hideHeader?: boolean;
+  suppressSuccessToast?: boolean;
+  onStepChange?: (step: 'email' | 'code' | 'password') => void;
 };
 
-export default function AuthForm({ type, onClose }: Props) {
+export default function AuthForm({ onClose, hideHeader = false, suppressSuccessToast = false, onStepChange }: Props) {
   const { sendLoginCode, verifyLoginCode } = useAuthStore();
   const [step, setStep] = useState<'email' | 'code' | 'password'>('email');
   const [email, setEmail] = useState('');
@@ -48,13 +51,14 @@ export default function AuthForm({ type, onClose }: Props) {
     // Optimistic success UI: show success and go to code step immediately
     toast.success('Код надіслано на вашу електронну пошту');
     setStep('code');
+    onStepChange?.('code');
     // use zustand action
     Promise.resolve(sendLoginCode(nextEmail))
-      .then((resp: any) => {
+      .then((resp: { previewUrl: string | null }) => {
         if (resp.previewUrl) window.open(resp.previewUrl, '_blank', 'noopener,noreferrer');
         emailMethods.reset();
       })
-      .catch((err: any) => showErrorToast(err.message || String(err)));
+      .catch((err: { message?: string }) => showErrorToast(err.message || String(err)));
   };
 
   const handlePasswordSubmit = () => {
@@ -69,11 +73,12 @@ export default function AuthForm({ type, onClose }: Props) {
     // Optimistic success UI on resend
     toast.success('Код повторно надіслано');
     setStep('code');
+    onStepChange?.('code');
     Promise.resolve(sendLoginCode(email))
-      .then((data: any) => {
+      .then((data: { previewUrl: string | null }) => {
         if (data.previewUrl) window.open(data.previewUrl, '_blank', 'noopener,noreferrer');
       })
-      .catch((err: any) => showErrorToast(err.message || String(err)));
+      .catch((err: { message?: string }) => showErrorToast(err.message || String(err)));
   };
 
   const handleVerifyCode = () => {
@@ -84,9 +89,11 @@ export default function AuthForm({ type, onClose }: Props) {
     Promise.resolve(verifyLoginCode(email, code))
       .then(() => {
         passwordMethods.reset();
-        toast.success('Ви успішно зайшли в кабінет');
+        if (!suppressSuccessToast) {
+          toast.success('Ви успішно зайшли в кабінет');
+        }
       })
-      .catch((error: any) => {
+      .catch((error: { message?: string }) => {
         showErrorToast(error.message || String(error));
       });
   };
@@ -103,9 +110,11 @@ export default function AuthForm({ type, onClose }: Props) {
           )}
           
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-2xl font-bold text-center">Увійти в особистий кабінет</h1>
-          </div>
+          {!hideHeader && (
+            <div className="mb-8">
+              <h1 className="text-2xl font-bold text-center">Увійти в особистий кабінет</h1>
+            </div>
+          )}
 
           {/* Social Login Buttons */}
           <div className="flex flex-col gap-3 mb-6">
@@ -179,7 +188,7 @@ export default function AuthForm({ type, onClose }: Props) {
           />
         </div>
         <div className="animate-fly-in-from-top">
-          <Button type="button" onClick={handleVerifyCode} className="w-full bg-orange text-white py-3 rounded-lg mb-6">
+          <Button type="button" onClick={handleVerifyCode} className="w-full bg-orange text-white py-4 min-h-[50px] rounded-lg mb-6">
             Підтвердити
           </Button>
         </div>
@@ -203,10 +212,12 @@ export default function AuthForm({ type, onClose }: Props) {
         )}
         
         {/* Header */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-center mb-2">Увійти до</h2>
-          <p className="text-gray-500 text-center">{email}</p>
-        </div>
+        {!hideHeader && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-center mb-2">Увійти до</h2>
+            <p className="text-gray-500 text-center">{email}</p>
+          </div>
+        )}
 
         {/* Password Field */}
         <div className="mb-6">

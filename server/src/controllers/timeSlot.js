@@ -1,4 +1,4 @@
-import { getBookingByDateAndTime, createBooking as createBookingSvc, findBookingById, deleteBooking } from '../services/timeSlot.js';
+import { getBookingByDateAndTime, createBooking as createBookingSvc, findBookingById, deleteBooking, findBookingsByUserId } from '../services/timeSlot.js';
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 
 // Получение слотов по дате
@@ -79,6 +79,13 @@ export const cancelBooking = async (req, res) => {
   });
 };
 
+export const getMyBookings = async (req, res) => {
+  const userId = req.user.id;
+  const bookings = await findBookingsByUserId(userId);
+  res.json({ status: 'success', data: bookings });
+};
+
 export const getTimeSlotsByDateHandler = ctrlWrapper(getTimeSlotsByDate);
 export const createBookingHandler = ctrlWrapper(createBooking);
 export const cancelBookingHandler = ctrlWrapper(cancelBooking);
+export const getMyBookingsHandler = ctrlWrapper(getMyBookings);
