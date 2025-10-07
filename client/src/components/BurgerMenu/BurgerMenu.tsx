@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Menu, User, MapPin, Phone, Mail, Facebook, Instagram, Info, FileText, ExternalLink, ChevronRight } from 'lucide-react';
+import { Menu, User, Phone, Mail, Facebook, Instagram, Info, FileText, ExternalLink, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AuthForm from '../AuthForm/AuthForm';
 import CloseButton from '../CloseButton/CloseButton';
@@ -60,7 +60,7 @@ export default function BurgerMenu() {
                 </button>
                 <div className="mt-3 p-4 bg-white border border-gray-300 rounded-lg shadow-md">
                   <p className="text-sm text-gray-600">
-                    <span className="font-semibold">Авторизуйтесь</span> щоб спростити процес замовлення та користуватися додатковими функціями.
+                    <span className="font-semibold">Авторизуйтесь</span> щоб спростити процес запису та користуватися додатковими функціями.
                   </p>
                 </div>
               </div>
@@ -69,20 +69,13 @@ export default function BurgerMenu() {
               <div className="mb-6">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4">Контакти</h3>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 border-b border-gray-200">
-                  <div className="flex items-center gap-3">
-                    <MapPin size={20} className="text-gray-800" />
-                    <span className="text-gray-700">вулиця Грушевського, 66, Хмельницький, Хмельницька область, Україна</span>
-                  </div>
-                  <ExternalLink size={16} className="text-gray-400" />
-                </div>
                 <div className="flex items-center gap-3 p-3 border-b border-gray-200">
                   <Phone size={20} className="text-gray-800" />
                   <span className="text-gray-700">+380979665165</span>
                 </div>
                 <div className="flex items-center gap-3 p-3 border-b border-gray-200">
                   <Mail size={20} className="text-gray-800" />
-                  <span className="text-gray-700">Potocki.xx@gmail.com</span>
+                  <span className="text-gray-700">diana.xx@gmail.com</span>
                 </div>
                 </div>
               </div>
@@ -153,7 +146,7 @@ export default function BurgerMenu() {
           <div className="absolute right-0 top-0 h-full w-4/5 bg-white shadow-2xl animate-in slide-in-from-right duration-300">
             {/* Auth Content */}
             <div className="p-8">
-              <AuthForm type="login" onClose={() => setIsAuthOpen(false)} />
+              <AuthForm type="login" />
             </div>
           </div>
           

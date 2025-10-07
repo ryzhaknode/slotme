@@ -67,6 +67,14 @@ export default function DateMenu({ selectedService = "Консультація",
   const navigateMonth = (direction: 'prev' | 'next') => {
     const newDate = new Date(currentDate);
     if (direction === 'prev') {
+      // prevent navigating to past months relative to today
+      const today = new Date();
+      const prev = new Date(currentDate);
+      prev.setMonth(prev.getMonth() - 1);
+      // if previous month is before current month-year of today, block
+      if (prev.getFullYear() < today.getFullYear() || (prev.getFullYear() === today.getFullYear() && prev.getMonth() < today.getMonth())) {
+        return;
+      }
       newDate.setMonth(newDate.getMonth() - 1);
     } else {
       newDate.setMonth(newDate.getMonth() + 1);
@@ -101,6 +109,12 @@ export default function DateMenu({ selectedService = "Консультація",
     return date.toDateString() === today.toDateString();
   };
 
+  const isPastDay = (date: Date) => {
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+    return date < startOfToday;
+  };
+
   const isSelected = (date: Date) => {
     return selectedDate && date.toDateString() === selectedDate.toDateString();
   };
@@ -126,7 +140,8 @@ export default function DateMenu({ selectedService = "Консультація",
       <div className="flex items-center justify-center mb-4">
         <button
           onClick={() => navigateMonth('prev')}
-          className="flex items-center justify-center w-10 h-10 bg-orange hover:bg-orange-600 text-white rounded-full transition-all duration-200 shadow-md hover:shadow-lg"
+          disabled={(() => { const t=new Date(); return currentDate.getFullYear()===t.getFullYear() && currentDate.getMonth()===t.getMonth(); })()}
+          className={`flex items-center justify-center w-10 h-10 rounded-full transition-all duration-200 shadow-md ${(() => { const t=new Date(); const isCurrent=currentDate.getFullYear()===t.getFullYear() && currentDate.getMonth()===t.getMonth(); return isCurrent ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-orange hover:bg-orange-600 text-white hover:shadow-lg'; })()}`}
           aria-label="Попередній місяць"
         >
           <ChevronLeft className="w-6 h-6" />
@@ -157,11 +172,13 @@ export default function DateMenu({ selectedService = "Консультація",
           <button
             key={index}
             onClick={() => date && handleDateSelect(date)}
-            disabled={!date}
+            disabled={!date || (date && isPastDay(date))}
             className={`
               aspect-square flex items-center justify-center text-sm font-medium rounded-lg transition-all duration-200
               ${!date 
                 ? 'bg-transparent cursor-default' 
+                : (date && isPastDay(date))
+                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                 : isSelected(date)
                 ? 'bg-orange text-white'
                 : isCurrentMonth(date)

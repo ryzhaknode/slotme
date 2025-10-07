@@ -17,3 +17,18 @@ export const getAllUsers = async (currentUserId) => {
 
   return users;
 };
+
+export const getCurrentUser = async (userId) => {
+  return prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, name: true, lastName: true, age: true, email: true },
+  });
+};
+
+export const updateCurrentUser = async (userId, data) => {
+  return prisma.user.update({
+    where: { id: userId },
+    data,
+    select: { id: true, name: true, lastName: true, age: true, email: true },
+  });
+};

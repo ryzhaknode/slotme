@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchTimeSlotsByDate, bookTimeSlot, cancelBooking, type ITimeSlotStatus, type IBookingRequest, type IBookingResponse } from '../api/timeSlots';
+import { fetchTimeSlotsByDate, bookTimeSlot, cancelBooking, fetchMyBookings, type IBookingRequest, type IUserBookingItem } from '../api/timeSlots';
 
 // Ключи для кеширования
 export const timeSlotsKeys = {
@@ -25,6 +25,15 @@ export const useTimeSlots = (date: string) => {
   });
 };
 
+// Хук для моих бронирований
+export const useMyBookings = () => {
+  return useQuery({
+    queryKey: ['myBookings'],
+    queryFn: () => fetchMyBookings(),
+    staleTime: 60 * 1000,
+  });
+};
+
 // Хук для бронирования слота
 export const useBookTimeSlot = () => {
   const queryClient = useQueryClient();
@@ -36,6 +45,8 @@ export const useBookTimeSlot = () => {
       queryClient.invalidateQueries({
         queryKey: timeSlotsKeys.byDate(variables.date)
       });
+      // Инвалидируем список моих записей
+      queryClient.invalidateQueries({ queryKey: ['myBookings'] });
       
       // Показываем уведомление об успехе
       console.log('Booking successful:', data.message);
@@ -57,6 +68,8 @@ export const useCancelBooking = () => {
       queryClient.invalidateQueries({
         queryKey: timeSlotsKeys.all
       });
+      // Инвалидируем список моих записей
+      queryClient.invalidateQueries({ queryKey: ['myBookings'] });
     },
     onError: (error: any) => {
       console.error('Cancel booking failed:', error.message);

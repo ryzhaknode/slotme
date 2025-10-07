@@ -1,6 +1,6 @@
-import axios from 'axios';
+import instance from '@/utils/axiosInterceptor';
 
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = '/api';
 
 export interface ITimeSlot {
   id: string;
@@ -34,14 +34,23 @@ export interface IBookingResponse {
   bookingId?: string;
 }
 
+export interface IUserBookingItem {
+  id: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  service: { id: string; name: string };
+}
+
 // Получение статусов слотов по дате
 export const fetchTimeSlotsByDate = async (date: string): Promise<ITimeSlotStatus[]> => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/time-slots/${date}`);
+    const response = await instance.get(`${API_BASE_URL}/time-slots/${date}`);
     return response.data.data;
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Если сервер недоступен, возвращаем mock данные
-    if (error.code === 'ERR_CONNECTION_REFUSED' || error.code === 'ERR_NETWORK') {
+    const err = error as { code?: string };
+    if (err.code === 'ERR_CONNECTION_REFUSED' || err.code === 'ERR_NETWORK') {
       console.warn('Server is not available, using mock time slots');
       return generateMockTimeSlots(date);
     }
@@ -51,14 +60,27 @@ export const fetchTimeSlotsByDate = async (date: string): Promise<ITimeSlotStatu
 
 // Бронирование слота
 export const bookTimeSlot = async (bookingData: IBookingRequest): Promise<IBookingResponse> => {
-  const response = await axios.post(`${API_BASE_URL}/time-slots/bookings`, bookingData);
+  const response = await instance.post(`${API_BASE_URL}/time-slots/bookings`, bookingData);
   return response.data;
 };
 
 // Отмена бронирования
 export const cancelBooking = async (bookingId: string): Promise<IBookingResponse> => {
-  const response = await axios.delete(`${API_BASE_URL}/time-slots/bookings/${bookingId}`);
+  const response = await instance.delete(`${API_BASE_URL}/time-slots/bookings/${bookingId}`);
   return response.data;
+};
+
+// Мои бронирования
+export const fetchMyBookings = async (): Promise<IUserBookingItem[]> => {
+  const response = await instance.get(`${API_BASE_URL}/time-slots/bookings/me`);
+  const items = response.data.data as Array<{
+    id: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+    service: { id: string; name: string };
+  }>;
+  return items;
 };
 
 // Генерация mock данных для слотов (11:00 - 21:00)
