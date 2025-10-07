@@ -7,7 +7,7 @@ type Props = {
 export default function Layout({ children }: Props) {
   return (
     <>
-      <div className="min-w-[300px] w-full mx-auto min-h-screen bg-gray-100">
+      <div className="min-w-[300px] w-full mx-auto">
         <main className="pb-[30px]">{children}</main>
       </div>
       <Toaster />

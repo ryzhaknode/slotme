@@ -42,7 +42,7 @@
   font-size: 16px;
 
   color: var(--black);
-  background-color: var(--background-main);
+  background-color: #f3f4f6; /* gray-100 for iOS overscroll */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -153,7 +153,7 @@ img {
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-white text-foreground;
   }
 }
 
